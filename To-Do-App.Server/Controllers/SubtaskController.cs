@@ -100,7 +100,7 @@ namespace To_Do_App.Server.Controllers
         [HttpDelete("{subtaskId}", Name = "DeleteSubtask")]
         public async Task<IActionResult> DeleteSubtask(Guid subtaskId)
         {
-            if(await _subtaskService.GetSubtask(subtaskId) == null)
+            if (await _subtaskService.GetSubtask(subtaskId) == null)
             {
                 return NotFound("Nie znaleziono podzadania o podanym identyfikatorze!");
             }
@@ -114,5 +114,6 @@ namespace To_Do_App.Server.Controllers
             {
                 return StatusCode(500, $"Wystąpił błąd serwera: {ex.Message}");
             }
+        }
     }
 }

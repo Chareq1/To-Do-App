@@ -86,5 +86,41 @@ namespace To_Do_App.Server.Services
                 throw new DbUpdateException("Nie można usunąć zadania z bazy danych!", ex);
             }
         }
+
+        // GET
+        public async Task<IEnumerable<Models.Task>> GetTasksByCategory(Guid userId, Guid categoryId)
+        {
+            return await _context.Tasks.Where(t => t.UserId == userId && t.CategoryId == categoryId).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Models.Task>> GetTasksByPriority(Guid userId, int priority)
+        {
+            return await _context.Tasks.Where(t => t.UserId == userId && (int)t.Priority == priority).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Models.Task>> GetTasksByStatus(Guid userId, int status)
+        {
+            return await _context.Tasks.Where(t => t.UserId == userId && (int)t.Status == status).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Models.Task>> GetTasksByDueDate(Guid userId, DateTime dueDate)
+        {
+            return await _context.Tasks.Where(t => t.UserId == userId && t.DueDate == dueDate).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Models.Task>> GetTasksByDueDateRange(Guid userId, DateTime startDate, DateTime endDate)
+        {
+            return await _context.Tasks.Where(t => t.UserId == userId && t.DueDate >= startDate && t.DueDate <= endDate).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Models.Task>> GetTasksByName(Guid userId, string name)
+        {
+            return await _context.Tasks.Where(t => t.UserId == userId && t.Name == name).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Models.Task>> GetTasksByCreatedDate(Guid userId, DateTime createdDate)
+        {
+            return await _context.Tasks.Where(t => t.UserId == userId && t.CreatedAt == createdDate).ToListAsync();
+        }
     }
 }
