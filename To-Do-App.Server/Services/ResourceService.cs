@@ -91,5 +91,22 @@ namespace To_Do_App.Server.Services
                 throw new DbUpdateException("Nie można usunąć załącznika z bazy danych!", ex);
             }
         }
+
+
+        //GET
+        public async Task<IEnumerable<Resource>> GetResourcesByTask(Guid taskId)
+        {
+            return await _context.Resources.Where(r => r.TaskId == taskId).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Resource>> GetResourcesBySubtask(Guid subtaskId)
+        {
+            return await _context.Resources.Where(r => r.SubtaskId == subtaskId).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Resource>> GetResourcesByType(String type)
+        {
+            return await _context.Resources.Where(r => r.ResourceType == type).ToListAsync();
+        }
     }
 }

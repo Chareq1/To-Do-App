@@ -24,7 +24,7 @@ namespace To_Do_App.Server.Models
         public Guid? TaskId { get; set; }
 
         [Column("subtaskId")]
-        public Guid? subtaskId { get; set; }
+        public Guid? SubtaskId { get; set; }
 
         [Column("uploadDate")]
         public DateTime UploadDate { get; set; }

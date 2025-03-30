@@ -116,5 +116,59 @@ namespace To_Do_App.Server.Controllers
                 return StatusCode(500, $"Wystąpił błąd serwera: {ex.Message}");
             }
         }
+
+        [HttpGet("task/{taskId}", Name = "GetResourcesByTask")]
+        public async Task<ActionResult<IEnumerable<Resource>>> GetResourcesByTask(Guid taskId)
+        {
+            try
+            {
+                var resources = await _resourceService.GetResourcesByTask(taskId);
+                if (resources == null || !resources.Any())
+                {
+                    return NotFound("Brak zasobów przypisanych do zadania o podanym identyfikatorze!");
+                }
+                return Ok(resources);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Wystąpił błąd serwera: {ex.Message}");
+            }
+        }
+
+        [HttpGet("subtask/{subtaskId}", Name = "GetResourcesBySubtask")]
+        public async Task<ActionResult<IEnumerable<Resource>>> GetResourcesBySubtask(Guid subtaskId)
+        {
+            try
+            {
+                var resources = await _resourceService.GetResourcesBySubtask(subtaskId);
+                if (resources == null || !resources.Any())
+                {
+                    return NotFound("Brak zasobów przypisanych do podzadania o podanym identyfikatorze!");
+                }
+                return Ok(resources);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Wystąpił błąd serwera: {ex.Message}");
+            }
+        }
+
+        [HttpGet("type/{type}", Name = "GetResourcesByType")]
+        public async Task<ActionResult<IEnumerable<Resource>>> GetResourcesByType(String type)
+        {
+            try
+            {
+                var resources = await _resourceService.GetResourcesByType(type);
+                if (resources == null || !resources.Any())
+                {
+                    return NotFound("Brak zasobów o podanym typie!");
+                }
+                return Ok(resources);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Wystąpił błąd serwera: {ex.Message}");
+            }
+        }
     }
 }
