@@ -1,54 +1,100 @@
-﻿using To_Do_App.Server.Data;
+﻿using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.EntityFrameworkCore;
+using To_Do_App.Server.Data;
 using To_Do_App.Server.Models;
+using To_Do_App.Server.Services.Interfaces;
 
 namespace To_Do_App.Server.Services
 {
     public class AvatarService : IAvatarService
     {
-        ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
 
         public AvatarService(ApplicationDbContext context)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public IEnumerable<Avatar> GetAvatars()
+        public async Task<IEnumerable<Avatar>> GetAvatars()
         {
-            return _context.Avatars.ToList();
+            return await _context.Avatars.ToListAsync();
         }
 
-        public Avatar? GetAvatar(Guid avatarId)
+        public async Task<Avatar?> GetAvatar(Guid avatarId)
         {
-            return _context.Avatars.FirstOrDefault(a => a.AvatarId == avatarId);
+            return await _context.Avatars.FirstOrDefaultAsync(a => a.AvatarId == avatarId);
         }
 
-        public Avatar AddAvatar(Avatar avatar)
+        public async Task<Avatar> AddAvatar(Avatar avatar)
         {
-            _context.Avatars.Add(avatar);
-            _context.SaveChanges();
-            return avatar;
-        }
-
-        public Avatar UpdateAvatar(Avatar avatar)
-        {
-            _context.Avatars.Update(avatar);
-            _context.SaveChanges();
-            return avatar;
-        }
-
-        public void DeleteAvatar(Guid avatarId)
-        {
-            var avatar = GetAvatar(avatarId);
-            if (avatar != null)
+            if(avatar == null)
             {
-                _context.Avatars.Remove(avatar);
-                _context.SaveChanges();
+                throw new ArgumentNullException(nameof(avatar));
+            }
+
+            try
+            {
+                await _context.Avatars.AddAsync(avatar);
+                await _context.SaveChangesAsync();
+                return avatar;
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new DbUpdateException("Nie można dodać awatara do bazy danych!", ex);
             }
         }
 
-        public Avatar? GetDefaultAvatar()
+        public async System.Threading.Tasks.Task UpdateAvatar(Guid avatarId, JsonPatchDocument<Avatar> patchDoc)
         {
-            return _context.Avatars.FirstOrDefault(a => a.FileName == "default.png");
+            if (patchDoc == null)
+            {
+                throw new ArgumentNullException(nameof(patchDoc));
+            }
+
+            try
+            {
+                var existingAvatar = await GetAvatar(avatarId);
+
+                if (existingAvatar == null)
+                {
+                    throw new Exception("Nie znaleziono awatara o podanym identyfikatorze!");
+                }
+
+                patchDoc.ApplyTo(existingAvatar);
+
+                _context.Avatars.Update(existingAvatar);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new DbUpdateException("Nie można zaktualizować awatara w bazie danych!", ex);
+            }
+        }
+
+        public async System.Threading.Tasks.Task DeleteAvatar(Guid avatarId)
+        {
+            try
+            {
+                var avatar = await GetAvatar(avatarId);
+                if (avatar != null)
+                {
+                    _context.Avatars.Remove(avatar);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    throw new Exception("Nie znaleziono awatara o podanym identyfikatorze!");
+                }
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new DbUpdateException("Nie można usunąć awatara z bazy danych!", ex);
+            }
+        }
+
+        public async Task<Avatar?> GetDefaultAvatar()
+        {
+            return await _context.Avatars.FirstOrDefaultAsync(a => a.FileName == "default.png");
         }
     }
 }

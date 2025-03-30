@@ -40,12 +40,12 @@ function App() {
             </table>;
 
     return (
-        <div>
+        <header>
             <h1 id="tableLabel">Avatar List</h1>
             <p>This component demonstrates fetching data from the server.</p>
             <button onClick={populateAvatarData}>Refresh Data</button>
             {contents}
-        </div>
+        </header>
     );
 
     async function populateAvatarData() {

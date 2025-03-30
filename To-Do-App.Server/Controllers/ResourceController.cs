@@ -1,0 +1,120 @@
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.Design;
+using To_Do_App.Server.Models;
+using To_Do_App.Server.Services;
+using To_Do_App.Server.Services.Interfaces;
+
+namespace To_Do_App.Server.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class ResourceController : ControllerBase
+    {
+        private readonly Services.Interfaces.IResourceService _resourceService;
+
+        public ResourceController(Services.Interfaces.IResourceService resourceService)
+        {
+            _resourceService = resourceService;
+        }
+
+        [HttpGet(Name = "GetAllUserResources")]
+        public async Task<ActionResult<IEnumerable<Resource>>> GetResources()
+        {
+            try
+            {
+                var resources = await _resourceService.GetResources();
+                if (resources == null || !resources.Any())
+                {
+                    return NotFound("Brak zasobów w bazie danych!");
+                }
+                return Ok(resources);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Wystąpił błąd serwera: {ex.Message}");
+            }
+        }
+
+        [HttpGet("{resourceId}", Name = "GetResourceById")]
+        public async Task<ActionResult<Resource>> GetResource(Guid resourceId)
+        {
+            try
+            {
+                var resource = await _resourceService.GetResource(resourceId);
+                if (resource == null)
+                {
+                    return NotFound("Nie znaleziono zasobu o podanym identyfikatorze!");
+                }
+                return Ok(resource);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Wystąpił błąd serwera: {ex.Message}");
+            }
+        }
+
+        [HttpPost(Name = "AddResource")]
+        public async Task<ActionResult<Resource>> AddResource([FromBody] Resource resource)
+        {
+            if (resource == null)
+            {
+                return BadRequest("Nieprawidłowe dane zasobu!");
+            }
+
+            try
+            {
+                var newResource = await _resourceService.AddResource(resource);
+                return CreatedAtRoute("GetResourceById", new { resourceId = newResource.ResourceId }, newResource);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Wystąpił błąd serwera: {ex.Message}");
+            }
+        }
+
+        [HttpPatch("{resourceId}", Name = "UpdateResource")]
+        public async Task<IActionResult> UpdateResource(Guid resourceId, [FromBody] JsonPatchDocument<Resource> pathDoc)
+        {
+            if (pathDoc == null)
+            {
+                return BadRequest("Nieprawidłowe dane zasobu!");
+            }
+
+            if(await _resourceService.GetResource(resourceId) == null)
+            {
+                return NotFound("Nie znaleziono zasobu o podanym identyfikatorze!");
+            }
+
+            try
+            {
+                await _resourceService.UpdateResource(resourceId, pathDoc);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Wystąpił błąd serwera: {ex.Message}");
+            }
+        }
+
+        [HttpDelete("{resourceId}", Name = "DeleteResource")]
+        public async Task<IActionResult> DeleteResource(Guid resourceId)
+        {
+            if (await _resourceService.GetResource(resourceId) == null)
+            {
+                return NotFound("Nie znaleziono zasobu o podanym identyfikatorze!");
+            }
+
+            try
+            {
+                await _resourceService.DeleteResource(resourceId);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Wystąpił błąd serwera: {ex.Message}");
+            }
+        }
+    }
+}

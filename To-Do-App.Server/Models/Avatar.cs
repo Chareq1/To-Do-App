@@ -11,9 +11,11 @@ namespace To_Do_App.Server.Models
         public Guid AvatarId { get; set; }
 
         [Column("fileName")]
+        [MaxLength(255)]
         public String? FileName { get; set; }
 
         [Column("filePath")]
+        [MaxLength(255)]
         public String? FilePath { get; set; }
     }
 }

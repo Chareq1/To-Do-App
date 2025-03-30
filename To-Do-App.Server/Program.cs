@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using To_Do_App.Server.Data;
 using To_Do_App.Server.Services;
+using To_Do_App.Server.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc.NewtonsoftJson; // Add this using directive
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,12 +15,17 @@ builder.Services.AddDbContext<ApplicationDbContext>(
         builder.Configuration.GetConnectionString("DatabaseSettings") ??
         throw new InvalidOperationException("Konfiguracja bazy danych nie znaleziona"))
 );
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(); // Move AddNewtonsoftJson here
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 builder.Services.AddScoped<IAvatarService, AvatarService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<ISubtaskService, SubtaskService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IResourceService, ResourceService>();
 
 // Add Kestrel server options to handle connection state issues
 builder.WebHost.ConfigureKestrel(serverOptions =>
