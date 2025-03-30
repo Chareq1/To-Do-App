@@ -101,7 +101,7 @@ namespace To_Do_App.Server.Controllers
         [HttpDelete("{categoryId}", Name = "DeleteCategory")]
         public async Task<IActionResult> DeleteCategory(Guid categoryId)
         {
-            if(await _categoryService.GetCategory(categoryId) == null)
+            if (await _categoryService.GetCategory(categoryId) == null)
             {
                 return NotFound("Nie znaleziono kategorii o podanym identyfikatorze!");
             }
@@ -116,5 +116,24 @@ namespace To_Do_App.Server.Controllers
                 throw new Exception($"Wystąpił błąd podczas usuwania kategorii: {ex.Message}");
             }
         }
+
+        [HttpGet("name/{name}", Name = "GetCategoryByName")]
+        public async Task<ActionResult<Category>> GetCategoryByName(Guid userId, string name)
+        {
+            try
+            {
+                var category = await _categoryService.GetCategoriesByName(userId, name);
+                if (category == null)
+                {
+                    return NotFound("Nie znaleziono kategorii o podanej nazwie!");
+                }
+                return Ok(category);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Wystąpił błąd serwera: {ex.Message}");
+            }
+        }
+
     }
 }

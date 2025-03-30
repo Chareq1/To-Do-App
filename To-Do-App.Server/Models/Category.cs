@@ -10,6 +10,10 @@ namespace To_Do_App.Server.Models
         [Column("categoryId")]
         public Guid CategoryId { get; set; }
 
+        [Column("name")]
+        [MaxLength(255)]
+        public String Name { get; set; }
+
         [Column("colorHex")]
         [MaxLength(7)]
         public String ColorHex { get; set; }

@@ -89,5 +89,12 @@ namespace To_Do_App.Server.Services
                 throw new DbUpdateException("Nie można usunąć kategorii z bazy danych!", ex);
             }
         }
+
+
+        //GET
+        public async Task<IEnumerable<Category>> GetCategoriesByName(Guid userId, string name)
+        {
+            return await _context.Categories.Where(c => c.UserId == userId && c.Name == name).ToListAsync();
+        }
     }
 }
