@@ -14,5 +14,6 @@ namespace To_Do_App.Server.Services.Interfaces
         public Task<User?> GetUserByEmail(string email);
         public Task<User?> GetUserByUsernameAndPassword(string username, string password);
         public Task<User?> GetUserByEmailAndPassword(string email, string password);
+        public bool VerifyPassword(String hash, String password);
     }
 }

@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using To_Do_App.Server.Data;
 using To_Do_App.Server.Services;
 using To_Do_App.Server.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc.NewtonsoftJson; // Add this using directive
+using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Text; // Add this using directive
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,12 +21,26 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Add services for dependency injection    
 builder.Services.AddScoped<IAvatarService, AvatarService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<ISubtaskService, SubtaskService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IResourceService, ResourceService>();
+
+// Add authentication and authorization services
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.LoginPath = "/api/auth/login";
+        options.LogoutPath = "/api/auth/logout";
+        options.SlidingExpiration = true;
+    });
+
 
 // Add Kestrel server options to handle connection state issues
 builder.WebHost.ConfigureKestrel(serverOptions =>
@@ -41,8 +56,8 @@ builder.Services.AddCors(opt =>
     {
         policy.WithOrigins("https://localhost:51351")
         .AllowAnyHeader()
-        .AllowCredentials()
-        .AllowAnyMethod();
+        .AllowAnyMethod()
+        .AllowCredentials();
     });
 });
 
@@ -50,6 +65,11 @@ var app = builder.Build();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Resources")),
+    RequestPath = "/Resources"
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -60,6 +80,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
@@ -69,3 +90,6 @@ app.UseCors("CORS");
 app.MapFallbackToFile("/index.html");
 
 app.Run();
+
+Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+Console.OutputEncoding = Encoding.UTF8;

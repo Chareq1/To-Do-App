@@ -4,6 +4,7 @@ using System.Xml.Linq;
 using To_Do_App.Server.Data;
 using To_Do_App.Server.Models;
 using To_Do_App.Server.Services.Interfaces;
+using BCrypt.Net;
 
 namespace To_Do_App.Server.Services
 {
@@ -35,6 +36,8 @@ namespace To_Do_App.Server.Services
 
             try
             {
+                user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+
                 await _context.Users.AddAsync(user);
                 await _context.SaveChangesAsync();
                 return user;
@@ -111,6 +114,11 @@ namespace To_Do_App.Server.Services
         public async Task<User?> GetUserByEmailAndPassword(String email, String password)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Password == password);
+        }
+
+        public bool VerifyPassword(String hash, String password)
+        {
+            return BCrypt.Net.BCrypt.Verify(password, hash);
         }
     }
 }
