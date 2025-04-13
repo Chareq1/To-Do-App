@@ -1,7 +1,7 @@
 ﻿import { useState, useEffect } from "react";  
 import { useUser } from "../context/UserContext";  
-import { useNavigate, Navigate } from "react-router-dom";  
-import { Citrus } from "lucide-react";  
+import { useNavigate, Navigate, Link, replace } from "react-router-dom";  
+import { Notebook } from "lucide-react";  
 import LoadingScreen from "../components/LoadingScreen";  
 
 const Login = () => {  
@@ -10,20 +10,24 @@ const Login = () => {
    const [email, setEmail] = useState("");  
    const [password, setPassword] = useState("");  
    const [isDisabled, setIsDisabled] = useState(false);  
-   const [button, setButton] = useState(<>Zaloguj się</>);  
+    const [button, setButton] = useState(<>Zaloguj się</>);  
+    const [authLoading, setAuthLoading] = useState(false);
    const navigate = useNavigate();  
 
    useEffect(() => {  
        document.body.classList.add("bg-[#212121]");
        document.body.classList.replace("bg-[#ffffff]", "bg-[#212121]");
 
-       if (!loading && user) {  
-           document.body.classList.replace("bg-[#212121]", "bg-[#ffffff]");  
-           navigate("/home");  
-       }  
+       if (!loading && user) {
+           setAuthLoading(true);
+           setTimeout(() => {
+               setAuthLoading(false);
+               navigate("/home");
+           }, 1500);
+       }
    }, [loading, user]);  
 
-   if (loading || initialLoading) {  
+   if (loading || initialLoading || authLoading) {  
        return <LoadingScreen />;  
    }  
 
@@ -38,8 +42,8 @@ const Login = () => {
            setIsDisabled(true);  
            setButton(  
                <>  
-                   <Citrus className="animate-bounce size-6/12 text-white" />  
-                   <span className="sr-only">Loading...</span>  
+                   <Notebook className="animate-bounce size-6/12 text-white" />
+                   <span className="sr-only">Loading...</span>
                </>  
            );  
 
@@ -53,7 +57,9 @@ const Login = () => {
                setButton(<>Zaloguj się</>);  
            } else {  
                await login(email, password);  
-               navigate("/home");  
+               setTimeout(() => {
+                   navigate("/home");
+               }, 1500);
            }  
        } catch (error) {  
            console.error(error);  
@@ -66,22 +72,31 @@ const Login = () => {
    };  
 
    return (  
-       <div className="w-screen h-screen flex items-center justify-center">  
-           <div className="bg-[#212121] md:text-sm md:rounded-xl lg:text-base lg:rounded-2xl flex flex-col items-center shadow-[0px_9px_30px_rgba(0,0,0,0.3)] p-8">  
-               <h2 className="md:text-lg lg:text-xl text-[#8696BB]">Hej,</h2>  
-               <h2 className="font-bold md:text-xl lg:text-2xl">  
-                   Gotowy na administrację?  
-               </h2>  
-               <Citrus color="#63c5da" size="135" strokeWidth={0.35} />  
-               <form className="flex flex-col w-full px-4">  
-                   <label className="ml-3 md:text-sm lg:text-base font-bold">  
+       <div className="w-full flex items-center justify-center md:flex-row m-0 h-screen font-[Ubuntu] flex-col">  
+           <div className="w-full  h-full rounded-xl items-center justify-center p-5 relative sm:flex-1 lg:flex-2">
+               <img src="/Resources/login1.jpg" className="rounded-xl object-cover h-full" />
+
+               <div className="absolute text-white text-left top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                   <h1 className="text-5xl font-bold md:text-7xl">Hej,</h1>
+                   <h2 className="text-3xl font-semi md:text-5xl">Gotowy na planowanie?</h2>
+               </div>
+
+               <div className="absolute top-10 left-10">
+                   <Notebook size="48" color="white"/>
+               </div>
+           </div>
+
+           <div className="w-full bg-[#212121] rounded-2xl flex flex-col p-5 items-center flex-1 text-left">  
+               <label className="text-4xl text-[#e8e8e8] mb-10 font-bold text-left w-3/4 pl-5">Zaloguj się</label>  
+               <form className="flex flex-col w-full px-4 items-center">  
+                   <label className="ml-5 mb-1 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-3/4">  
                        E-mail  
                    </label>  
                    <input  
                        type="email"  
                        name="email"  
                        placeholder="E-mail"  
-                       className="border-[#63c5da] border-2 pl-5 h-14 bg-white rounded-lg md:text-sm lg:text-base"  
+                       className="border-[#2775EE] border-2 pl-5 h-14 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-3/4"  
                        value={email}  
                        onChange={(e) => setEmail(e.target.value)}  
                        onKeyDown={(e) => {  
@@ -89,30 +104,36 @@ const Login = () => {
                                document.getElementsByName("password")[0].focus();  
                        }}  
                    />  
-                   <label className="ml-3 md:text-sm lg:text-base font-bold mt-5">  
+
+                   <label className="ml-5 mb-1 md:text-sm lg:text-base font-bold mt-5 text-[#e8e8e8] w-3/4">  
                        Hasło  
                    </label>  
                    <input  
                        type="password"  
                        name="password"  
                        placeholder="Hasło"  
-                       className="border-[#63c5da] border-2 md:p-4 lg:pl-5 h-14 bg-white rounded-lg md:text-sm lg:text-base"  
+                       className="border-[#2775EE] border-2 mb-15 md:p-4 pl-5 h-14 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-3/4"  
                        value={password}  
                        onChange={(e) => setPassword(e.target.value)}  
                        onKeyDown={(e) => {  
                            if (e.key === "Enter") handleLogin();  
                        }}  
                    />  
+
                    <button  
                        type="button"  
-                       className="flex items-center justify-center text-white mt-5 h-16 bg-[#63c5da] md:rounded-lg lg:rounded-xl md:text-base lg:text-lg shadow-[0px_9px_30px_rgba(0,0,0,0.3)]"  
+                       className="flex rounded-full items-center justify-center text-white h-16 bg-[#2775EE] md:text-base lg:text-lg shadow-[0px_9px_30px_rgba(0,0,0,0.3)] w-3/4"  
                        onClick={() => handleLogin()}  
                        disabled={isDisabled}  
                    >  
                        {button}  
-                   </button>  
+                   </button>
+
+                   <div className="mt-3">
+                       <p className="text-[#E8E8E8]">Nie masz konta? &nbsp; <Link to="/register" className="text-[#2775EE]">Zarejestruj się</Link></p>
+                   </div>
                </form>  
-           </div>  
+           </div> 
        </div>  
    );  
 };  

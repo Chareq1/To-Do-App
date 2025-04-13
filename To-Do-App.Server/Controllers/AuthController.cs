@@ -56,12 +56,25 @@ namespace To_Do_App.Server.Controllers
         }
 
         [HttpGet("me")]
-        public IActionResult Me()
+        public async Task<IActionResult> Me()
         {
             if (!User.Identity?.IsAuthenticated ?? true)
                 return Unauthorized(new { Message = "User is not authenticated" });
 
-            return Ok(new { Email = User.Identity?.Name });
+            var user = await _userService.GetUserByEmail(User.Identity.Name);
+            if (user == null)
+                return Unauthorized(new { Message = "User not found" });
+
+            return Ok(new
+            {
+                user.UserId,
+                user.Username,
+                user.Name,
+                user.Surname,
+                user.Email,
+                user.Phone,
+                user.AvatarId
+            });
         }
     }
 }
