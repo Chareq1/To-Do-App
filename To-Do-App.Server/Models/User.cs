@@ -35,6 +35,6 @@ namespace To_Do_App.Server.Models
         public String? Phone { get; set; }
 
         [Column("avatarId")]
-        public Guid? AvatarId { get; set; }
+        public Guid AvatarId { get; set; }
     }
 }

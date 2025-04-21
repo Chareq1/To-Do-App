@@ -38,6 +38,10 @@ namespace To_Do_App.Server.Services
             {
                 user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
 
+                var defaultAvatar = await _context.Avatars.FirstOrDefaultAsync(a => a.FileName == "default.png");
+
+                user.AvatarId = defaultAvatar!.AvatarId;
+
                 await _context.Users.AddAsync(user);
                 await _context.SaveChangesAsync();
                 return user;

@@ -2,7 +2,9 @@
 import './App.css';
 import Home from './pages/Home';
 import Login from './pages/Login';
+import NotFound from './pages/NotFound';
 import { useUser } from './context/UserContext';
+import Register from './pages/Register';
 
 function App() {
     const { user } = useUser();
@@ -19,6 +21,10 @@ function App() {
                     element={!user ? <Login /> : <Navigate to="/home" />}
                 />
                 <Route
+                    path="/register"
+                    element={!user ? <Register /> : <Navigate to="/home" />}
+                />
+                <Route
                     index
                     element={
                         user ? (
@@ -29,6 +35,7 @@ function App() {
                     }
                 />
             </Route>
+            <Route path="*" element={<NotFound />} />
         </Routes>
     );
 }
