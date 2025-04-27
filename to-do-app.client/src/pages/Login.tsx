@@ -1,22 +1,20 @@
 ﻿import { useState, useEffect } from "react";
 import { useUser } from "../context/UserContext";
 import { useNavigate, Navigate, Link } from "react-router-dom";
-import { Notebook } from "lucide-react";
+import { Notebook, LogIn } from "lucide-react";
 import LoadingScreen from "../components/LoadingScreen";
 
 const Login = () => {
-    //POLA
     const { user, login, loading, initialLoading } = useUser();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isDisabled, setIsDisabled] = useState(false);
-    const [button, setButton] = useState(<>Zaloguj się</>);
+    const [button, setButton] = useState(<><LogIn className="w-5 h-5 mr-2" /><p className="">Zaloguj się</p></>);
     const [authLoading, setAuthLoading] = useState(false);
     const [error, setError] = useState(null);
 
     const navigate = useNavigate();
 
-    //Sprawdzenie, czy jakiś użytkownik jest zalogowany
     useEffect(() => {
         document.body.classList.add("bg-[#212121]");
         document.body.classList.replace("bg-[#ffffff]", "bg-[#212121]");
@@ -38,7 +36,6 @@ const Login = () => {
         return <Navigate to="/" />;
     }
 
-    //Metoda do obsługi logowania użytkownika
     const handleLogin = async () => {
         try {
             setError(null);
@@ -50,15 +47,14 @@ const Login = () => {
                 </>
             );
 
-            //Sprawdzenie, czy pola e-mail i hasło są puste
             if (!email) {
                 setError(<>Proszę wprowadzić e-mail użytkownika!</>);
                 setIsDisabled(false);
-                setButton(<>Zaloguj się</>);
+                setButton(<><LogIn className="w-5 h-5 mr-2" /><p className="">Zaloguj się</p></>);
             } else if (!password) {
                 setError(<>Proszę wprowadzić hasło użytkownika!</>);
                 setIsDisabled(false);
-                setButton(<>Zaloguj się</>);
+                setButton(<><LogIn className="w-5 h-5 mr-2" /><p className="">Zaloguj się</p></>);
             } else {
                 await login(email, password);
                 setTimeout(() => {
@@ -68,14 +64,14 @@ const Login = () => {
         } catch (error) {
             console.error(error);
             setIsDisabled(false);
-            setButton(<>Zaloguj się</>);
+            setButton(<><LogIn className="w-5 h-5 mr-2" /><p className="">Zaloguj się</p></>);
             setError(<>Nieporawny e-mail lub hasło użytkownika!</>);
         }
     };
 
     return (
         <div className="w-full flex items-center justify-center md:flex-row flex-col m-0 min-h-screen font-[Ubuntu]">
-            { /* Lewa sekcja z obrazem*/}
+            {/* Left Section with Image */}
             <div className="w-full h-full md:h-screen rounded-xl items-center justify-center p-5 relative sm:flex-1 lg:flex-2 overflow-hidden">
                 <img src="/Resources/login1.jpg" className="rounded-xl object-cover h-full w-full" />
 
@@ -89,11 +85,11 @@ const Login = () => {
                 </div>
             </div>
 
-            { /* Prawa sekcja z formularzem */}
-            <div className="w-full bg-[#212121] rounded-2xl flex flex-col p-5 items-center flex-1 text-left overflow-y-auto max-h-screen">
-                <div className="flex flex-col items-center justify-center w-full h-full">
+            {/* Right Section with Form */}
+            <div className="w-full bg-[#212121] rounded-2xl flex flex-col items-start justify-start md:items-center md:justify-center flex-1 text-left overflow-y-auto h-full p-5">
+                <div className="flex flex-col items-center justify-center w-full max-w-lg">
                     <label className="text-4xl text-[#e8e8e8] font-bold text-left w-3/4 pl-5 pb-10">Zaloguj się</label>
-                    <form className="flex flex-col w-full px-4 items-center">
+                    <form className="flex flex-col w-full px-4 items-center justify-center">
                         <label className="pl-5 pb-1 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-3/4">E-mail</label>
                         <input
                             type="email"
@@ -129,7 +125,7 @@ const Login = () => {
 
                         <button
                             type="button"
-                            className="flex rounded-full items-center justify-center text-white h-12 bg-[#2775EE] md:text-base lg:text-lg shadow-[0px_9px_30px_rgba(0,0,0,0.3)] w-3/4 "
+                            className="flex rounded-full items-center justify-center text-white h-12 bg-[#2775EE] md:text-base lg:text-lg shadow-[0px_9px_30px_rgba(0,0,0,0.3)] hover:bg-[#0F52BA] w-3/4 "
                             onClick={handleLogin}
                             disabled={isDisabled}
                         >

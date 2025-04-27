@@ -1,6 +1,6 @@
 ﻿import { useState, useEffect } from "react";
 import { useNavigate, Navigate, Link } from "react-router-dom";
-import { Notebook } from "lucide-react";
+import { Notebook, KeySquare } from "lucide-react";
 import LoadingScreen from "../components/LoadingScreen";
 import { useUser } from "../context/UserContext";
 
@@ -15,7 +15,7 @@ const Register = () => {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [isDisabled, setIsDisabled] = useState(false);
     const [authLoading, setAuthLoading] = useState(false);
-    const [button, setButton] = useState(<>Zarejestruj się</>);
+    const [button, setButton] = useState(<><KeySquare className="w-5 h-5 mr-2" /><p className="">Zarejestruj się</p></>);
     const [error, setError] = useState(null);
 
     const navigate = useNavigate();
@@ -88,7 +88,7 @@ const Register = () => {
             if (!username || !name || !surname || !email || !password || !confirmPassword) {
                 setError(<>Wszystkie pola są wymagane!</>);
                 setIsDisabled(false);
-                setButton(<>Zarejestruj się</>);
+                setButton(<><KeySquare className="w-5 h-5 mr-2" /><p className="">Zarejestruj się</p></>);
                 return;
             }
 
@@ -96,7 +96,7 @@ const Register = () => {
             if (!validateUsername(username)) {
                 setError(<>Nazwa użytkownika zawiera niedozwolone znaki!</>);
                 setIsDisabled(false);
-                setButton(<>Zarejestruj się</>);
+                setButton(<><KeySquare className="w-5 h-5 mr-2" /><p className="">Zarejestruj się</p></>);
                 return;
             }
 
@@ -104,7 +104,7 @@ const Register = () => {
             if (!validateName(name)) {
                 setError(<>Imię zawiera niedozwolone znaki!</>);
                 setIsDisabled(false);
-                setButton(<>Zarejestruj się</>);
+                setButton(<><KeySquare className="w-5 h-5 mr-2" /><p className="">Zarejestruj się</p></>);
                 return;
             }
 
@@ -112,7 +112,7 @@ const Register = () => {
             if (!validateSurname(surname)) {
                 setError(<>Nazwisko zawiera niedozwolone znaki!</>);
                 setIsDisabled(false);
-                setButton(<>Zarejestruj się</>);
+                setButton(<><KeySquare className="w-5 h-5 mr-2" /><p className="">Zarejestruj się</p></>);
                 return;
             }
 
@@ -120,7 +120,7 @@ const Register = () => {
             if (!validateEmail(email)) {
                 setError(<>Nieprawidłowy format adresu e-mail!</>);
                 setIsDisabled(false);
-                setButton(<>Zarejestruj się</>);
+                setButton(<><KeySquare className="w-5 h-5 mr-2" /><p className="">Zarejestruj się</p></>);
                 return;
             }
 
@@ -128,7 +128,7 @@ const Register = () => {
             if (!validatePassword(password)) {
                 setError(<>Hasło musi mieć co najmniej 8 znaków, zawierać: jedną dużą i małą literę, jedną cyfrę i jeden znak specjalny!</>);
                 setIsDisabled(false);
-                setButton(<>Zarejestruj się</>);
+                setButton(<><KeySquare className="w-5 h-5 mr-2" /><p className="">Zarejestruj się</p></>);
                 return;
             }
 
@@ -136,7 +136,7 @@ const Register = () => {
             if (password !== confirmPassword) {
                 setError(<>Hasła muszą być takie same!</>);
                 setIsDisabled(false);
-                setButton(<>Zarejestruj się</>);
+                setButton(<><KeySquare className="w-5 h-5 mr-2" /><p className="">Zarejestruj się</p></>);;
                 return;
             }
 
@@ -152,7 +152,7 @@ const Register = () => {
                 const data = await response.json();
                 setError(<>{data.message}</>);
                 setIsDisabled(false);
-                setButton(<>Zarejestruj się</>);
+                setButton(<><KeySquare className="w-5 h-5 mr-2" /><p className="">Zarejestruj się</p></>);
                 return;
             }
 
@@ -162,7 +162,7 @@ const Register = () => {
         } catch (error) {
             console.error(error);
             setIsDisabled(false);
-            setButton(<>Zarejestruj się</>);
+            setButton(<><KeySquare className="w-5 h-5 mr-2" /><p className="">Zarejestruj się</p></>);
             setError(<>Rejestracja nie powiodła się!</>);
         }
     };
@@ -199,6 +199,10 @@ const Register = () => {
                                 className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-full"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter")
+                                        document.getElementsByName("email")[0].focus();
+                                }}    
                             />
                         </div>
 
@@ -212,6 +216,10 @@ const Register = () => {
                                 className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-full"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter")
+                                        document.getElementsByName("name")[0].focus();
+                                }}    
                             />
                         </div>
 
@@ -225,6 +233,10 @@ const Register = () => {
                                 className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-full"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter")
+                                        document.getElementsByName("surname")[0].focus();
+                                }}    
                             />
                         </div>
 
@@ -238,6 +250,10 @@ const Register = () => {
                                 className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-full"
                                 value={surname}
                                 onChange={(e) => setSurname(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter")
+                                        document.getElementsByName("password")[0].focus();
+                                }}    
                             />
                         </div>
 
@@ -252,6 +268,10 @@ const Register = () => {
                                 className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-full"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter")
+                                        document.getElementsByName("confirmPassword")[0].focus();
+                                }}    
                             />
                         </div>
 
@@ -266,6 +286,9 @@ const Register = () => {
                                 className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-full"
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") handleRegister();
+                                }}            
                             />
                         </div>
 
@@ -276,7 +299,7 @@ const Register = () => {
                         <div className="col-span-2">
                             <button
                                 type="button"
-                                className="flex rounded-full items-center justify-center text-white h-12 bg-[#2775EE] md:text-base lg:text-lg shadow-[0px_9px_30px_rgba(0,0,0,0.3)] w-full"
+                                className="flex rounded-full items-center justify-center text-white h-12 bg-[#2775EE] md:text-base lg:text-lg shadow-[0px_9px_30px_rgba(0,0,0,0.3)] w-full hover:bg-[#0F52BA]"
                                 onClick={handleRegister}
                                 disabled={isDisabled}
                             >

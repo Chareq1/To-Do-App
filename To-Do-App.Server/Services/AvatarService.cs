@@ -36,6 +36,7 @@ namespace To_Do_App.Server.Services
             {
                 await _context.Avatars.AddAsync(avatar);
                 await _context.SaveChangesAsync();
+
                 return avatar;
             }
             catch (DbUpdateException ex)
@@ -78,6 +79,13 @@ namespace To_Do_App.Server.Services
                 var avatar = await GetAvatar(avatarId);
                 if (avatar != null)
                 {
+                    var deletePath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", "Avatars", avatar?.FileName);
+
+                    if (File.Exists(deletePath))
+                    {
+                        File.Delete(deletePath);
+                    }
+
                     _context.Avatars.Remove(avatar);
                     await _context.SaveChangesAsync();
                 }

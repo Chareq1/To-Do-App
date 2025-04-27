@@ -4,21 +4,9 @@ import { useUser } from '../context/UserContext'
 import LoadingScreen from '../components/LoadingScreen';
 import { useEffect } from 'react';
 import Navigation from '../components/Navigation';
-import { Home as HomeIcon, LayoutDashboard, StickyNote, Calendar, Layers, Flag, Settings, LifeBuoy } from 'lucide-react';
 
 function Home() {
     const { user, loggingOut, loading } = useUser();
-
-    const sidebarItems = [
-        { icon: <HomeIcon size={20} />, text: "Home", active: true, alert: false },
-        { icon: <LayoutDashboard size={20} />, text: "Dashboard", active: false, alert: false },
-        { icon: <StickyNote size={20} />, text: "Projects", active: false, alert: true },
-        { icon: <Calendar size={20} />, text: "Calendar", active: false, alert: false },
-        { icon: <Layers size={20} />, text: "Tasks", active: false, alert: false },
-        { icon: <Flag size={20} />, text: "Reporting", active: false, alert: false },
-        { icon: <Settings size={20} />, text: "Settings", active: false, alert: false },
-        { icon: <LifeBuoy size={20} />, text: "Help", active: false, alert: false },
-    ];
 
    useEffect(() => {
        document.body.classList.add("bg-[#212121]");

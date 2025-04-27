@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using To_Do_App.Server.Data;
 using To_Do_App.Server.Models;
 using To_Do_App.Server.Services;
 using To_Do_App.Server.Services.Interfaces;
@@ -13,10 +14,12 @@ namespace To_Do_App.Server.Controllers
     public class AvatarController : ControllerBase
     {
         private readonly IAvatarService _avatarService;
+        private readonly IUserService _userService;
 
-        public AvatarController(IAvatarService avatarService)
+        public AvatarController(IAvatarService avatarService, IUserService userService)
         {
             _avatarService = avatarService;
+            _userService = userService;
         }
 
         [HttpGet(Name = "GetAllAvatars")]
@@ -56,15 +59,45 @@ namespace To_Do_App.Server.Controllers
         }
 
         [HttpPost(Name = "AddAvatar")]
-        public async Task<ActionResult<Avatar>> AddAvatar([FromBody] Avatar avatar)
+        public async Task<ActionResult<Avatar>> AddAvatar([FromForm] FileUploadRequest file, [FromQuery] Guid userId)
         {
-            if (avatar == null)
+            if (file == null || file.File.Length == 0)
             {
-                return BadRequest("Nieprawidłowe dane wejściowe!");
+                return BadRequest("Brak pliku!");
             }
 
             try
             {
+                var user = await _userService.GetUser(userId);
+                var defaultAvatar = await _avatarService.GetDefaultAvatar();
+                var currentAvatar = user.AvatarId;
+
+                if(defaultAvatar?.AvatarId != user.AvatarId)
+                {
+                    await _avatarService.DeleteAvatar(user.AvatarId);
+                }
+
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "Resources", "Avatars");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.File.FileName)}";
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.File.CopyToAsync(stream);
+                }
+
+                var avatar = new Avatar
+                {
+                    AvatarId = Guid.NewGuid(),
+                    FileName = fileName,
+                    FilePath = "/Resources/Avatars/"
+                };
+
                 var createdAvatar = await _avatarService.AddAvatar(avatar);
                 return CreatedAtRoute("GetAvatarById", new { avatarId = createdAvatar.AvatarId }, createdAvatar);
             }

@@ -17,7 +17,8 @@ interface UserContextType {
    logout: () => Promise<void>;
    initialLoading: boolean; // Added missing property
    loggingIn: boolean; // Added missing property
-   loggingOut: boolean; // Added missing property
+    loggingOut: boolean; // Added missing property
+    refreshData: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -28,6 +29,23 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
    const [initialLoading, setInitialLoading] = useState(true);
    const [loggingIn, setLoggingIn] = useState(false);
     const [loggingOut, setLoggingOut] = useState(false);
+
+    const refreshData = async () => {
+        try {
+            const response = await fetch("/api/auth/me", { credentials: "include" });
+            if (response.ok) {
+                const data = await response.json();
+                setUser(data);
+            } else {
+                setUser(null);
+            }
+        } catch {
+            setUser(null);
+        } finally {
+           setLoading(false);
+           setInitialLoading(false);
+        }
+    };
 
     const checkAuth = async () => {
         try {
@@ -83,7 +101,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
    };
 
    return (
-       <UserContext.Provider value={{ user, loading, login, logout, initialLoading, loggingIn, loggingOut }}>
+       <UserContext.Provider value={{ user, loading, login, logout, initialLoading, loggingIn, loggingOut, refreshData }}>
            {children}
        </UserContext.Provider>
    );

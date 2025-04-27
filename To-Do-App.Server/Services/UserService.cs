@@ -5,6 +5,7 @@ using To_Do_App.Server.Data;
 using To_Do_App.Server.Models;
 using To_Do_App.Server.Services.Interfaces;
 using BCrypt.Net;
+using System.Diagnostics;
 
 namespace To_Do_App.Server.Services
 {
@@ -54,28 +55,39 @@ namespace To_Do_App.Server.Services
 
         public async System.Threading.Tasks.Task UpdateUser(Guid userId, JsonPatchDocument<User> patchDoc)
         {
-            if (patchDoc == null)
-            {
-                throw new ArgumentNullException(nameof(patchDoc));
-            }
-
             try
             {
-                var existingUser = await GetUser(userId);
+                var existingUser = await _context.Users.FindAsync(userId);
+                var currentPassword = existingUser?.Password;
 
                 if (existingUser == null)
                 {
-                    throw new Exception("Nie znaleziono użytkownika o podanym identyfikatorze!");
+                    throw new Exception("User not found.");
                 }
 
+                // Apply the patch document to the existing user
                 patchDoc.ApplyTo(existingUser);
+
+                // Check if the password has been updated
+                var passwordOperation = patchDoc.Operations.FirstOrDefault(op => op.path == "/password");
+                if (passwordOperation != null && passwordOperation.value != null)
+                {
+                    string newPassword = passwordOperation.value.ToString();
+                    if (!string.IsNullOrEmpty(newPassword) &&
+                        !BCrypt.Net.BCrypt.Verify(newPassword.ToString(), currentPassword.ToString()))
+                    {
+                        existingUser.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
+                    }
+                }
 
                 _context.Users.Update(existingUser);
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateException ex)
+            catch (Exception ex)
             {
-                throw new DbUpdateException("Nie można zaktualizować użytkownika w bazie danych!", ex);
+                // Log the exception
+                Console.WriteLine($"Error in UpdateUser: {ex.Message}");
+                throw;
             }
         }
 
@@ -86,6 +98,19 @@ namespace To_Do_App.Server.Services
                 var user = await GetUser(userId);
                 if (user != null)
                 {
+                    var userAvatar = await _context.Avatars.FirstOrDefaultAsync(a => a.AvatarId == user.AvatarId);
+                    var defaultAvatar = await _context.Avatars.FirstOrDefaultAsync(a => a.FileName == "default.png");
+
+                    if (userAvatar != null && userAvatar.AvatarId != defaultAvatar!.AvatarId)
+                    {
+                        var deletePath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", "Avatars", userAvatar.FileName);
+                        if (File.Exists(deletePath))
+                        {
+                            File.Delete(deletePath);
+                        }
+                        _context.Avatars.Remove(userAvatar);
+                    }
+
                     _context.Users.Remove(user);
                     await _context.SaveChangesAsync();
                 }
