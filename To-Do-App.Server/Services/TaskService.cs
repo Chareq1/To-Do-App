@@ -3,6 +3,7 @@ using To_Do_App.Server.Services.Interfaces;
 using To_Do_App.Server.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.JsonPatch;
+using System.Threading.Tasks;
 
 namespace To_Do_App.Server.Services
 {
@@ -34,6 +35,13 @@ namespace To_Do_App.Server.Services
 
             try
             {
+                task.CreatedAt = DateTime.UtcNow;
+
+                if (task.DueDate.HasValue)
+                {
+                    task.DueDate = DateTime.SpecifyKind(task.DueDate.Value, DateTimeKind.Local);
+                }
+
                 _context.Tasks.Add(task);
                 _context.SaveChanges();
                 return task;
@@ -61,6 +69,13 @@ namespace To_Do_App.Server.Services
                 }
 
                 patchDoc.ApplyTo(existingTask);
+
+                if (existingTask.DueDate.HasValue)
+                {
+                    existingTask.DueDate = DateTime.SpecifyKind(existingTask.DueDate.Value, DateTimeKind.Local);
+                }
+
+                _context.Tasks.Update(existingTask);
                 _context.SaveChanges();
             }
             catch (DbUpdateException ex)

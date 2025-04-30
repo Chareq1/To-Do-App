@@ -9,8 +9,8 @@ body,
 }
 
 .avatar-container {
-    width: 10rem; /* Adjust as needed */
-    height: 10rem; /* Adjust as needed */
+    width: 10rem;
+    height: 10rem;
     border-radius: 50%;
     overflow: hidden;
     display: flex;
@@ -18,9 +18,47 @@ body,
     align-items: center;
 }
 
-.avatar-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
+    .avatar-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+    }
+
+.slide-pane {
+    background-color: #313131 !important;
+    @apply !rounded-bl-2xl !rounded-tl-2xl;
 }
+
+.slide-pane__header {
+    background-color: #2775EE !important;
+    color: white;
+    @apply !rounded-tl-2xl !font-bold;
+}
+
+.slide-pane__title {
+    @apply !font-bold;
+}
+
+input[type="color" i] {
+    @apply !rounded-full;
+    padding: 0px;
+    border-width: 2px;
+    border-style: solid;
+    border-color: #2775EE;
+}
+
+    /* Affects area between outer circle and color swatch. Firefox doesn't have an equivalent. */
+    input[type="color" i]::-webkit-color-swatch-wrapper {
+        padding: 1px;
+    }
+
+    /* Affects the inner circle, i.e. the current color selection */
+    input[type="color" i]::-webkit-color-swatch {
+        @apply !rounded-full p-0 border-0;
+    }
+
+    input[type="color" i]::-moz-color-swatch {
+        @apply !rounded-full p-0 border-0;
+    }
+

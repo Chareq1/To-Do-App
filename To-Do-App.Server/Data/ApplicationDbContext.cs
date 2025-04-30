@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using To_Do_App.Server.Models;
 
 namespace To_Do_App.Server.Data
@@ -18,19 +19,23 @@ namespace To_Do_App.Server.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.HasPostgresEnum<TaskStatus>();
+            modelBuilder.HasPostgresEnum<TaskPriority>();
+
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                foreach (var property in entityType.GetProperties())
+                {
+                    if (property.ClrType == typeof(DateTime) || property.ClrType == typeof(DateTime?))
+                    {
+                        property.SetValueConverter(new ValueConverter<DateTime, DateTime>(
+                            v => v.ToUniversalTime(), // Convert to UTC on save
+                            v => DateTime.SpecifyKind(v, DateTimeKind.Utc))); // Convert to UTC on read
+                    }
+                }
+            }
+
             base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<Models.Task>()
-                .Property(t => t.Status)
-                .HasConversion<string>();
-
-            modelBuilder.Entity<Models.Task>()
-                .Property(t => t.Priority)
-                .HasConversion<string>();
-
-            modelBuilder.Entity<Subtask>()
-                .Property(s => s.Status)
-                .HasConversion<string>();
         }
     }
 }

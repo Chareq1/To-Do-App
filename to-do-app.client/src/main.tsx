@@ -9,7 +9,6 @@ const rootElement = document.getElementById('root')!;
 rootElement.className = "w-full p-0 m-0 h-full";
 
 createRoot(rootElement).render(
-    <StrictMode>
         <UserProvider>
             <BrowserRouter>
                 <div className="flex justify-center items-center content-center w-full min-h-screen">
@@ -17,7 +16,6 @@ createRoot(rootElement).render(
                 </div>
             </BrowserRouter>
         </UserProvider>
-    </StrictMode>,
 )
 
 

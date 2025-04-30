@@ -25,11 +25,11 @@ namespace To_Do_App.Server.Models
         public Data.TaskPriority Priority { get; set; }
 
         [Column("categoryId")]
-        public Guid CategoryId { get; set; }
+        public Guid? CategoryId { get; set; }
 
         [Required]
         [Column("createdAt")]
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [Column("dueDate")]
         public DateTime? DueDate { get; set; }

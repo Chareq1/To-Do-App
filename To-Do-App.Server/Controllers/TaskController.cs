@@ -24,10 +24,6 @@ namespace To_Do_App.Server.Controllers
             try
             {
                 var tasks = await _taskService.GetTasks(userId);
-                if (tasks == null || !tasks.Any())
-                {
-                    return NotFound("Brak zadań w bazie danych!");
-                }
                 return Ok(tasks);
             }
             catch (Exception ex)

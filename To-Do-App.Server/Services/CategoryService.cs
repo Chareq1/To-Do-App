@@ -76,6 +76,9 @@ namespace To_Do_App.Server.Services
                 var category = await GetCategory(categoryId);
                 if (category != null)
                 {
+                    var tasksToDelete = await _context.Tasks.Where(t => t.CategoryId == categoryId).ToListAsync();
+                    _context.Tasks.RemoveRange(tasksToDelete);
+
                     _context.Categories.Remove(category);
                     await _context.SaveChangesAsync();
                 }

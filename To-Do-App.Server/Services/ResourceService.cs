@@ -99,11 +99,6 @@ namespace To_Do_App.Server.Services
             return await _context.Resources.Where(r => r.TaskId == taskId).ToListAsync();
         }
 
-        public async Task<IEnumerable<Resource>> GetResourcesBySubtask(Guid subtaskId)
-        {
-            return await _context.Resources.Where(r => r.SubtaskId == subtaskId).ToListAsync();
-        }
-
         public async Task<IEnumerable<Resource>> GetResourcesByType(String type)
         {
             return await _context.Resources.Where(r => r.ResourceType == type).ToListAsync();

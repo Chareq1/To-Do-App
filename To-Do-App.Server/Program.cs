@@ -13,10 +13,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<ApplicationDbContext>(
     options =>
-    options.UseNpgsql(
-        builder.Configuration.GetConnectionString("DatabaseSettings") ??
-        throw new InvalidOperationException("Konfiguracja bazy danych nie znaleziona"))
-);
+    {
+        var connectionString = builder.Configuration.GetConnectionString("DatabaseSettings")
+            ?? throw new InvalidOperationException("Konfiguracja bazy danych nie znaleziona");
+
+        options.UseNpgsql(connectionString, npgsqlOptions =>
+        {
+            npgsqlOptions.MapEnum<To_Do_App.Server.Data.TaskStatus>("task_status");
+            npgsqlOptions.MapEnum<To_Do_App.Server.Data.TaskPriority>("task_priority");
+        });
+    });
 builder.Services.AddControllers()
     .AddNewtonsoftJson(); // Move AddNewtonsoftJson here
 builder.Services.AddEndpointsApiExplorer();

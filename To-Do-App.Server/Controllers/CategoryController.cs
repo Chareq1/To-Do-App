@@ -24,11 +24,6 @@ namespace To_Do_App.Server.Controllers
             try
             {
                 var categories = await _categoryService.GetCategories(userId);
-                if (categories == null || !categories.Any())
-                {
-                    return NotFound("Brak kategorii w bazie danych!");
-                }
-
                 return Ok(categories);
             }
             catch (Exception ex)

@@ -1,12 +1,11 @@
-﻿namespace To_Do_App.Server.Data
+﻿using System.Runtime.Serialization;
+
+namespace To_Do_App.Server.Data
 {
     public enum TaskPriority
     {
-        [System.ComponentModel.DataAnnotations.Display(Name = "Niski")]
-        Niski,
-        [System.ComponentModel.DataAnnotations.Display(Name = "Średni")]
-        Średni,
-        [System.ComponentModel.DataAnnotations.Display(Name = "Wysoki")]
-        Wysoki
+        low,
+        medium,
+        high
     }
 }

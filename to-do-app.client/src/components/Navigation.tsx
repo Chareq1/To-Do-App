@@ -53,6 +53,7 @@ const Navigation = () => {
             <ul className="flex flex-col gap-y-2 text-white px-2 mt-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 h-full">
                 <NavLink
                     to="/home"
+                    title={!expanded ? "Strona główna" : ""}
                     className={({ isActive }) =>
                         `flex items-center gap-x-3 py-2 px-3 rounded-full cursor-pointer transition-colors ${isActive
                             ? "bg-white text-[#0F52BA] shadow-md font-bold"
@@ -68,6 +69,7 @@ const Navigation = () => {
 
                 <NavLink
                     to="/tasks"
+                    title={!expanded ? "Zadania" : ""}
                     className={({ isActive }) =>
                         `flex items-center gap-x-3 py-2 px-3 rounded-full cursor-pointer transition-colors ${isActive
                             ? "bg-white text-[#0F52BA] shadow-md font-bold"
@@ -83,6 +85,7 @@ const Navigation = () => {
 
                 <NavLink
                     to="/calendar"
+                    title={!expanded ? "Kalendarz" : ""}
                     className={({ isActive }) =>
                         `flex items-center gap-x-3 py-2 px-3 rounded-full cursor-pointer transition-colors ${isActive
                             ? "bg-white text-[#0F52BA] shadow-md font-bold"
@@ -126,6 +129,7 @@ const Navigation = () => {
 
                     <button
                         onClick={handleLogout}
+                        title={!expanded ? "Wyloguj" : ""}
                         className={`p-2 rounded-full bg-[#D0312D] text-white hover:bg-[#B90E0A] flex-shrink-0 ${!expanded ? "mt-2" : ""}`}
                     >
                         <LogOut size={20} />
