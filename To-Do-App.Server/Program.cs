@@ -32,7 +32,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAvatarService, AvatarService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
-builder.Services.AddScoped<ISubtaskService, SubtaskService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IResourceService, ResourceService>();
 

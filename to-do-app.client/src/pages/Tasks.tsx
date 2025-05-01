@@ -4,7 +4,7 @@ import { useUser } from '../context/UserContext';
 import LoadingScreen from '../components/LoadingScreen';
 import { useEffect, useState } from 'react';
 import Navigation from '../components/Navigation';
-import { Notebook, Plus, Edit, Trash2, Eye, ChevronDown, ChevronRight } from 'lucide-react';
+import { Notebook, Plus, Edit, Trash2, Eye, ChevronDown, ChevronRight, Download } from 'lucide-react';
 import SlidingPane from 'react-sliding-pane';
 import 'react-sliding-pane/dist/react-sliding-pane.css';
 import React from 'react';
@@ -18,7 +18,6 @@ interface Resource {
     fileName: string;
     filePath: string;
     taskId: string;
-    subtaskId: string;
     uploadDate: Date;
 }
 
@@ -40,18 +39,6 @@ interface Task {
     createdAt: Date;
     dueDate: Date;
     userId: string;
-    subtasks: Subtask[];
-    resources: Resource[];
-}
-
-interface Subtask {
-    subtaskId: string;
-    name: string;
-    description: string;
-    status: string;
-    createdAt: Date;
-    taskId: string;
-    dueDate: Date;
     resources: Resource[];
 }
 
@@ -97,7 +84,7 @@ function Tasks() {
 
     const fetchCategories = async () => {
         const response = await fetch(`/api/Category/user/${user?.userId}`);
-        console.log(response);
+
         if (!response.ok) {
             throw new Error('Failed to fetch categories');
         }
@@ -114,19 +101,17 @@ function Tasks() {
 
        const tasksWithDetails = await Promise.all(
            tasks.map(async (task: Task) => {
-               const [resourcesResponse, subtasksResponse] = await Promise.all([
-                   fetch(`/api/Resource/task/${task.taskId}`),
-                   fetch(`/api/Subtask/task/${task.taskId}`)
+               const [resourcesResponse] = await Promise.all([
+                   fetch(`/api/Resource/task/${task.taskId}`)
                ]);
 
-               if (!resourcesResponse.ok || !subtasksResponse.ok) {
+               if (!resourcesResponse.ok) {
                    throw new Error('Failed to fetch task details');
                }
 
                const resources = await resourcesResponse.json();
-               const subtasks = await subtasksResponse.json();
 
-               return { ...task, resources, subtasks };
+               return { ...task, resources };
            })
        );
 
@@ -144,6 +129,61 @@ function Tasks() {
         setPanelContent(null);
         setPanelData(null);
         setError(null);
+    };
+
+    const handleUploadFile = async (file: File, taskId: string) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("taskId", taskId);
+
+        try {
+            const response = await fetch(`/api/Resource?taskId=${taskId}`, {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to upload file");
+            }
+
+            // Fetch updated resources
+            const updatedResourcesResponse = await fetch(`/api/Resource/task/${taskId}`);
+            if (!updatedResourcesResponse.ok) {
+                throw new Error("Failed to fetch updated resources");
+            }
+            const updatedResources = await updatedResourcesResponse.json();
+
+            // Update tasks state
+            setTasks((prevTasks) =>
+                prevTasks.map((task) =>
+                    task.taskId === taskId ? { ...task, resources: updatedResources } : task
+                )
+            );
+
+            if (panelData?.taskId === taskId) {
+                setPanelData((prevPanelData) => ({
+                    ...prevPanelData,
+                    resources: updatedResources,
+                }));
+            }
+        } catch (error) {
+            console.error("Error uploading file:", error);
+        }
+    };
+
+    const handleDownloadFileFromURL = (filePath: string, fileName: string) => {
+        try {
+            const a = document.createElement("a");
+            a.href = filePath+fileName;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+
+            // Clean up
+            document.body.removeChild(a);
+        } catch (error) {
+            console.error("Error downloading file:", error);
+        }
     };
 
     const handleDeleteCategory = async (categoryId: string, categoryName: string) => {
@@ -183,12 +223,39 @@ function Tasks() {
             return;
         }
 
-        const response = await fetch(`/api/Resource/${resourceId}`, {
-            method: "DELETE",
-        });
+        try {
+            const response = await fetch(`/api/Resource/${resourceId}`, {
+                method: "DELETE",
+            });
 
-        const updatedTasks = await fetchTasks();
-        setTasks(updatedTasks);
+            if (!response.ok) {
+                throw new Error("Failed to delete resource");
+            }
+
+            // Fetch updated resources
+            const updatedResourcesResponse = await fetch(`/api/Resource/task/${taskId}`);
+            if (!updatedResourcesResponse.ok) {
+                throw new Error("Failed to fetch updated resources");
+            }
+            const updatedResources = await updatedResourcesResponse.json();
+
+            // Update tasks state
+            setTasks((prevTasks) =>
+                prevTasks.map((task) =>
+                    task.taskId === taskId ? { ...task, resources: updatedResources } : task
+                )
+            );
+
+            // Update panelData if the current task is being viewed
+            if (panelData?.taskId === taskId) {
+                setPanelData((prevPanelData) => ({
+                    ...prevPanelData,
+                    resources: updatedResources,
+                }));
+            }
+        } catch (error) {
+            console.error("Error deleting resource:", error);
+        }
     };
 
     const updateTaskStatus = async (taskId: string, newStatus) => {
@@ -227,14 +294,16 @@ function Tasks() {
     return loggingOut ? (
         <LoadingScreen />
     ) : (
-        <div className="flex w-full min-h-screen flex-row font-[Ubuntu] overflow-y-auto max-h-screen overflow-x-hidden">
+        <div className="flex w-full min-h-screen flex-row font-[Ubuntu] overflow-y-auto max-h-screen overflow-x-auto">
             <div className="p-5">
                 <Navigation />
-            </div>
+                </div>
+
             <div className="flex flex-col w-full pb-5 pt-5 pr-5 text-[#E8E8E8] max-h-screen min-h-screen">
-                <div className="flex flex-col h-full w-full bg-[#313131] rounded-xl overflow-hidden">
+                <div className="flex flex-col h-full w-full bg-[#313131] rounded-2xl overflow-hidden">
                     <div className="p-5 w-full flex justify-between items-center">
-                        <h1 className="font-bold text-4xl">Zadania</h1>
+                            <h1 className="font-bold text-4xl">Zadania</h1>
+
                         <div className="flex gap-2">
                             <button
                                     className="bg-[#2775EE] hover:bg-[#0F52BA] text-white px-4 py-2 rounded-full text-xs md:text-base flex justify-center items-center font-bold cursor-pointer"
@@ -243,7 +312,8 @@ function Tasks() {
                                 <Plus className="inline-block mr-2 font-bold" /> Dodaj kategorię
                             </button>
                         </div>
-                    </div>
+                        </div>
+
                         <div className="w-full h-full flex flex-col overflow-y-auto p-5">
                             {isLoading ? (
                                 <div
@@ -277,19 +347,20 @@ function Tasks() {
                                                         </div>
                                                     )}
                                                     <div className="flex items-center gap-2">
-                                                        <div className="text-xl">
+                                                        <div className="text-lg md:text-xl ">
                                                             {React.createElement(Icons[category.iconName] || Icons.Notebook, {
                                                                 style: { color: category.colorHex },
                                                             })}
                                                         </div>
                                                         <h2
-                                                            className="text-2xl font-bold"
+                                                            className="text-lg md:text-xl font-bold"
                                                             style={{ color: category.colorHex }}
                                                         >
                                                             {category.name}
                                                         </h2>
                                                     </div>
                                                 </div>
+
                                                 <div className="flex gap-2">
                                                     <button
                                                         className="text-blue-500 cursor-pointer hover:text-blue-600"
@@ -316,6 +387,7 @@ function Tasks() {
                                                     </button>
                                                 </div>
                                             </div>
+
                                             {!collapsedCategories.includes(category.categoryId) && (
                                                 <ul className="mt-2">
                                                     {tasks
@@ -323,9 +395,9 @@ function Tasks() {
                                                         .map((task) => (
                                                             <li
                                                                 key={task.taskId}
-                                                                className="flex justify-between items-center bg-[#515151] p-5 rounded-2xl mb-2"
+                                                                className="flex justify-between items-center bg-[#515151] p-5 rounded-2xl mb-2 w-full"
                                                             >
-                                                                <div className="flex items-center gap-2">
+                                                                <div className="flex items-center gap-2 w-full">
                                                                     <span className="flex items-center gap-2">
                                                                         <button
                                                                             className={`mr-3 cursor-pointer`}
@@ -335,11 +407,16 @@ function Tasks() {
                                                                             <CheckCircle className={`${task.status === 2 ? 'text-green-500' : 'text-gray-500'}`} />
                                                                         </button>
 
-                                                                        {task.status === 2 ? (
-                                                                            <span className="line-through">{task.name}</span>
-                                                                        ) : (
-                                                                            <span>{task.name}</span>
-                                                                        )}
+                                                                        <span
+                                                                            className={`text-sm md:text-base ${task.status === 2
+                                                                                    ? "line-through"
+                                                                                    : ""
+                                                                                }`}
+                                                                            title={task.name}
+                                                                        >
+                                                                            {task.name}
+                                                                        </span>
+
                                                                         {task.status === 1 && (
                                                                             <Clock className="text-yellow-500 w-4 h-4" title="W trakcie" />
                                                                         )}
@@ -354,6 +431,7 @@ function Tasks() {
                                                                             }`} title="Ważność" />
                                                                     </span>
                                                                 </div>
+
                                                                 <div className="flex gap-2">
                                                                     <button
                                                                         className="text-blue-500 cursor-pointer hover:text-blue-600"
@@ -384,8 +462,7 @@ function Tasks() {
                                         </div>
                                     ))}
 
-                                    {/* Render tasks without categories */}
-                                    <div className="bg-[#414141] rounded-2xl p-5">
+                                    <div className="bg-[#414141] rounded-2xl p-5 w-full">
                                         <div className="flex items-center justify-between">
                                             <div
                                                 className="flex items-center gap-2 cursor-pointer"
@@ -399,14 +476,16 @@ function Tasks() {
                                                     <div className="p-1 rounded-full bg-[#2775EE] mr-2 hover:bg-[#0F52BA]">
                                                         <ChevronDown className="text-[#E8E8E8]" />
                                                     </div>
-                                                )}
+                                                        )}
+
                                                 <div className="flex items-center gap-2">
-                                                    <Icons.BadgeAlert className="text-gray-400" />
-                                                    <h2 className="text-2xl font-bold text-gray-400">
+                                                    <Icons.BadgeAlert className="text-gray-400 text-lg md:text-xl" />
+                                                    <h2 className="text-lg md:text-xl font-bold text-gray-400">
                                                         Zadania bez kategorii
                                                     </h2>
                                                 </div>
                                             </div>
+
                                             <button
                                                 className="text-green-500 cursor-pointer hover:text-green-600"
                                                 onClick={() => { setSelectedIcon("Notebook"); openPanel('addTask', { categoryId: null }) }}
@@ -415,6 +494,7 @@ function Tasks() {
                                                 <Plus />
                                             </button>
                                         </div>
+
                                         {!collapsedCategories.includes('no-category') && (
                                             <ul className="mt-2">
                                                 {tasks
@@ -422,9 +502,9 @@ function Tasks() {
                                                     .map((task) => (
                                                         <li
                                                             key={task.taskId}
-                                                            className="flex justify-between items-center bg-[#515151] p-5 rounded-2xl mb-2"
+                                                            className="flex justify-between items-center bg-[#515151] p-5 rounded-2xl mb-2 w-full"
                                                         >
-                                                            <div className="flex items-center gap-2">
+                                                            <div className="flex items-center gap-2 w-full">
                                                                 <span className="flex items-center gap-2">
                                                                     <button
                                                                         className={`mr-3 cursor-pointer`}
@@ -434,11 +514,16 @@ function Tasks() {
                                                                         <CheckCircle className={`${task.status == 2 ? 'text-green-500' : 'text-gray-500'}`} />
                                                                     </button>
 
-                                                                    {task.status == 2 ? (
-                                                                        <span className="line-through">{task.name}</span>
-                                                                    ) : (
-                                                                        <span>{task.name}</span>
-                                                                    )}
+                                                                    <span
+                                                                        className={`text-sm md:text-base ${task.status === 2
+                                                                                ? "line-through"
+                                                                                : ""
+                                                                            }`}
+                                                                        title={task.name}
+                                                                    >
+                                                                        {task.name}
+                                                                    </span>
+
                                                                     {task.status == 1 && (
                                                                         <Clock className="text-yellow-500 w-4 h-4" title="W trakcie" />
                                                                     )}
@@ -503,7 +588,7 @@ function Tasks() {
                     }
                     onRequestClose={closePanel}
                     from="right"
-                    width="400px"
+                    width="425px"
                 >
                     {panelContent === 'addTask' && (
                         <div>
@@ -588,7 +673,7 @@ function Tasks() {
 
                                         closePanel();
                                     } catch (error) {
-                                        setError("Wystąpił błąd przy dodawaniu kategorii!");
+                                        setError("Wystąpił błąd przy dodawaniu zadania!");
                                     } finally {
                                         setIsDisabled(false);
                                         setButton(<><Plus className="w-5 h-5 lg:mr-2" /><p className="block">Dodaj</p></>);
@@ -636,7 +721,7 @@ function Tasks() {
                                                 document.getElementsByName("priority")[0].focus();
                                         }}
                                     >
-                                        <option value="todo" selected>Do zrobienia</option>
+                                        <option value="todo">Do zrobienia</option>
                                         <option value="inprogress">W trakcie</option>
                                         <option value="done">Zrobione</option>
                                     </select>
@@ -655,7 +740,7 @@ function Tasks() {
                                         }}
                                     >
                                         <option value="low">Niski</option>
-                                        <option value="medium" selected>Średni</option>
+                                        <option value="medium">Średni</option>
                                         <option value="high">Wysoki</option>
                                     </select>
                                 </div>
@@ -697,8 +782,7 @@ function Tasks() {
                     {panelContent === 'viewTask' && (
                         <div>
                             <form>
-                                <h2 className="text-lg md:text-2xl font-bold text-[#e8e8e8]">Informacje</h2>
-                                <div className="mt-2">
+                                <div className="">
                                     <label className="pl-5 pb-2 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-full">Nazwa zadania</label>
                                     <input
                                         type="text"
@@ -778,58 +862,69 @@ function Tasks() {
                                 </div>
                             </form>
 
-
-                            <div className="mt-10">
-                                <h2 className="text-lg md:text-2xl font-bold text-[#e8e8e8]">Podzadania</h2>
-                            </div>
-
-                            <div className="mt-10">
+                            <div className="mt-10 rounded-2xl bg-[#414141] p-5 overflow-y-auto overflow-x-hidden">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <h2 className="text-lg md:text-2xl font-bold text-[#e8e8e8]">Zasoby</h2>
+                                        <h2 className="text-lg md:text-2xl font-bold text-[#e8e8e8]">Pliki</h2>
                                     </div>
-                                    <button
+                                    <label
                                         className="text-green-500 cursor-pointer hover:text-green-600"
-                                        onClick={() => { setSelectedIcon("Notebook"); openPanel('addTask', { categoryId: null }) }}
                                         title="Dodaj plik"
                                     >
                                         <Plus />
-                                    </button>
+                                        <input
+                                            type="file"
+                                            className="hidden"
+                                            onChange={(e) => {
+                                                const file = e.target.files?.[0];
+                                                if (file && panelData?.taskId) {
+                                                    handleUploadFile(file, panelData.taskId);
+                                                }
+                                            }}
+                                        />
+                                    </label>
                                 </div>
 
                                 <div>
                                     {panelData.resources.map((resource) => (
-                                        <div key={resource.resourceId} className="flex justify-between items-center">
-                                            <a href={resource.filePath}>
-                                                {resource.fileName}
-                                            </a>
+                                        <div
+                                            key={resource.resourceId}
+                                            className="flex justify-between items-center rounded-2xl bg-[#515151] p-5 mt-2"
+                                        >
+                                            {/* Left Section: File Name and Type */}
+                                            <div className="flex flex-col w-2/3">
+                                                <span
+                                                    className="text-[#E8E8E8] font-bold text-sm truncate"
+                                                    title={resource.fileName} // Tooltip to show full file name on hover
+                                                >
+                                                    {resource.fileName}
+                                                </span>
+                                                <span className="text-gray-400 text-xs">{resource.resourceType}</span>
+                                            </div>
 
-                                            <button
-                                                className="text-red-500 cursor-pointer hover:text-red-600"
-                                                onClick={async () => {
-                                                    if (!panelData?.taskId) {
-                                                        console.error('Task ID is missing');
-                                                        return;
+                                            {/* Right Section: Buttons */}
+                                            <div className="flex gap-3">
+                                                <a
+                                                    href={`${resource.filePath}/${resource.fileName}`}
+                                                    download
+                                                    className="text-[#2775EE] cursor-pointer hover:text-[#0F52BA]"
+                                                    title="Pobierz plik"
+                                                >
+                                                    <Download />
+                                                </a>
+                                                <button
+                                                    className="text-red-500 cursor-pointer hover:text-red-600"
+                                                    onClick={() =>
+                                                        handleDeleteResource(resource.resourceId, resource.fileName, panelData.taskId)
                                                     }
-
-                                                    const updatedResourcesResponse = await fetch(`/api/Resource/task/${panelData.taskId}`);
-
-                                                    if (!updatedResourcesResponse.ok) {
-                                                        throw new Error('Failed to fetch updated resources');
-                                                    }
-
-                                                    const updatedResources = await updatedResourcesResponse.json();
-                                                    panelData.resources = updatedResources; // Removed optional chaining to fix TS2779
-                                                    handleDeleteResource(resource.resourceId, resource.fileName, panelData.taskId);
-                                                }}
-                                                title="Usuń plik"
-                                            >
-                                                <Trash2 />
-                                            </button>
+                                                    title="Usuń plik"
+                                                >
+                                                    <Trash2 />
+                                                </button>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
-
                             </div>
                         </div>
                     )}
@@ -941,7 +1036,7 @@ function Tasks() {
 
                                         closePanel();
                                     } catch (error) {set
-                                        setError("Wystąpił błąd przy aktualizacji kategorii!");
+                                        setError("Wystąpił błąd przy aktualizacji zadania!");
                                     } finally {
                                         setIsDisabled(false);
                                         setButton(<><Plus className="w-5 h-5 lg:mr-2" /><p className="block">Zapisz</p></>);

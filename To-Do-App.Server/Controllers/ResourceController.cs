@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.Design;
+using To_Do_App.Server.Data;
 using To_Do_App.Server.Models;
 using To_Do_App.Server.Services;
 using To_Do_App.Server.Services.Interfaces;
@@ -52,17 +53,41 @@ namespace To_Do_App.Server.Controllers
         }
 
         [HttpPost(Name = "AddResource")]
-        public async Task<ActionResult<Resource>> AddResource([FromBody] Resource resource)
+        public async Task<ActionResult<Resource>> AddResource([FromForm] FileUploadRequest file, [FromQuery] Guid taskId)
         {
-            if (resource == null)
+            if (file == null || file.File.Length == 0)
             {
-                return BadRequest("Nieprawidłowe dane zasobu!");
+                return BadRequest("Brak pliku!");
             }
 
             try
             {
-                var newResource = await _resourceService.AddResource(resource);
-                return CreatedAtRoute("GetResourceById", new { resourceId = newResource.ResourceId }, newResource);
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "Resources", "Files");
+
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                var filePath = Path.Combine(uploadsFolder, file.File.FileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.File.CopyToAsync(stream);
+                }
+
+                var resource = new Resource
+                {
+                    ResourceId = Guid.NewGuid(),
+                    ResourceType = file.File.ContentType,
+                    FileName = file.File.FileName,
+                    FilePath = "/Resources/Files",
+                    TaskId = taskId,
+                    UploadDate = DateTime.UtcNow
+                };
+
+                var createdResource = await _resourceService.AddResource(resource);
+                return CreatedAtRoute("GetResourceById", new { resourceId = createdResource.ResourceId }, createdResource);
             }
             catch (Exception ex)
             {

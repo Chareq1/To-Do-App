@@ -76,8 +76,16 @@ namespace To_Do_App.Server.Services
             try
             {
                 var resource = await GetResource(resourceId);
+
                 if (resource != null)
                 {
+                    var deletePath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", "Files", resource.FileName);
+
+                    if (File.Exists(deletePath))
+                    {
+                        File.Delete(deletePath);
+                    }
+
                     _context.Resources.Remove(resource);
                     await _context.SaveChangesAsync();
                 }

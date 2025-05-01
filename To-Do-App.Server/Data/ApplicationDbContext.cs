@@ -15,7 +15,6 @@ namespace To_Do_App.Server.Data
         public DbSet<Category> Categories { get; set; } = default!;
         public DbSet<Models.Task> Tasks { get; set; } = default!;
         public DbSet<Resource> Resources { get; set; } = default!;
-        public DbSet<Subtask> Subtasks { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
