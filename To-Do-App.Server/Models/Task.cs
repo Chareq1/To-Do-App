@@ -34,6 +34,9 @@ namespace To_Do_App.Server.Models
         [Column("dueDate")]
         public DateTime? DueDate { get; set; }
 
+        [Column("doneDate")]
+        public DateTime? DoneDate { get; set; }
+
         [Column("userId")]
         public Guid UserId { get; set; }
     }

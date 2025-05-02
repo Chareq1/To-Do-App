@@ -4,7 +4,7 @@ import { useUser } from '../context/UserContext';
 import LoadingScreen from '../components/LoadingScreen';
 import { useEffect, useState } from 'react';
 import Navigation from '../components/Navigation';
-import { Notebook, ChevronLeft, ChevronRight, Clock, AlertCircle, CheckCircle } from 'lucide-react';
+import { Notebook, ChevronLeft, ChevronRight, Clock, AlertCircle, CheckCircle, ClockAlert } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import {
     startOfMonth,
@@ -91,6 +91,7 @@ function Calendar() {
         try {
             const patchDoc = [
                 { op: "replace", path: "/status", value: newStatus },
+                { op: "replace", path: "/doneDate", value: newStatus === 2 ? new Date().toISOString() : null },
             ];
 
             const response = await fetch(`/api/Task/${taskId}`, {
@@ -203,7 +204,7 @@ function Calendar() {
                 day = addDays(day, 1);
             }
             rows.push(
-                <div className="grid grid-cols-7" key={day}>
+                <div className="grid grid-cols-7 h-full" key={day}>
                     {days}
                 </div>
             );
@@ -217,10 +218,107 @@ function Calendar() {
         (event) => isSameDay(new Date(event.start), selectedDate)
     );
 
+    const TaskCard = ({ task }: { task: any }) => {
+        const taskTime = task.start ? format(new Date(task.start), 'HH:mm', { locale: pl }) : null;
+        const isOutOfDate = task.start && new Date(task.start) < new Date() && task.status !== 2;
+
+        return (
+            <div
+                key={task.taskId}
+                className="flex items-center justify-between bg-[#515151] p-4 rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 mb-2 w-full"
+            >
+                <div className="flex items-center gap-4 w-full">
+                    {/* Badge */}
+                    <div
+                        className="w-12 h-12 flex items-center justify-center rounded-full font-bold shrink-0"
+                        style={{
+                            backgroundColor: task.category?.colorHex || 'var(--color-gray-400)',
+                        }}
+                    >
+                        {React.createElement(
+                            Icons[task.category?.iconName || 'BadgeAlert'],
+                            { className: 'text-white w-6 h-6' }
+                        )}
+                    </div>
+
+                    {/* Task Details */}
+                    <div className="flex flex-col w-full">
+                        <div className="flex items-center gap-2 w-full">
+                            <button
+                                className="mr-2 cursor-pointer w-5 h-5"
+                                onClick={() =>
+                                    updateTaskStatus(
+                                        task.taskId,
+                                        task.status === 2 ? 0 : 2
+                                    )
+                                }
+                                title={
+                                    task.status === 2
+                                        ? 'Oznacz jako niezrobione'
+                                        : 'Oznacz jako zrobione'
+                                }
+                            >
+                                <CheckCircle
+                                    className={`w-5 h-5 ${task.status === 2
+                                            ? 'text-green-500'
+                                            : 'text-gray-500'
+                                        }`}
+                                />
+                            </button>
+
+                            <h4
+                                className={`text-sm md:text-lg text-[#E8E8E8] break-all ${task.status === 2 ? 'line-through' : ''
+                                    }`}
+                            >
+                                {task.title}
+                            </h4>
+
+                            <div className="flex items-center gap-2 flex-col md:flex-row">
+                                {task.status === 1 && (
+                                    <Clock
+                                        className="text-yellow-500 w-4 h-4"
+                                        title="W trakcie"
+                                    />
+                                )}
+
+                                <AlertCircle
+                                    className={`w-4 h-4 ${task.priority === 2
+                                        ? 'text-red-500'
+                                        : task.priority === 1
+                                            ? 'text-yellow-500'
+                                            : 'text-green-500'
+                                        }`}
+                                    title="Ważność"
+                                />
+
+                                {isOutOfDate && (
+                                    <ClockAlert
+                                        className="text-red-500 w-4 h-4"
+                                        title="Przeterminowane"
+                                    />
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Time and Priority Indicator */}
+                        <div className="flex items-center justify-between">
+                            {taskTime && (
+                                <p className="text-xs md:text-sm text-gray-400">
+                                    {taskTime}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+
     return loggingOut ? (
         <LoadingScreen />
     ) : (
-            <div className="flex w-full min-h-screen flex-row font-[Ubuntu] overflow-y-auto">
+            <div className="flex w-full min-h-screen max-h-screen flex-row font-[Ubuntu] overflow-y-auto">
                 <div className="p-5">
                     <Navigation />
                 </div>
@@ -243,100 +341,24 @@ function Calendar() {
                                     <div className="w-full flex items-center justify-center h-full overflow-x-auto">
                                         <div className="flex flex-col md:flex-row w-full rounded-lg gap-y-5 md:gap-x-5 h-full p-5 min-w-0">
                                             {/* Calendar Section */}
-                                            <div className="md:w-1/2 w-full p-6 flex flex-col space-y-6 md:h-full rounded-2xl bg-[#414141] justify-center overflow-x-auto min-w-0">
+                                            <div className="md:w-1/2 w-full p-6 flex flex-col space-y-6 h-1/2 md:h-full rounded-2xl bg-[#414141] justify-center overflow-x-auto min-w-0">
                                                 {renderHeader()}
                                                 {renderDays()}
                                                 <div className="overflow-x-auto">{renderCells()}</div>
                                             </div>
 
                                             {/* Event Section */}
-                                            <div className="md:w-1/2 w-full p-5 flex flex-col space-y-6 rounded-2xl bg-[#414141] h-full min-w-0">
+                                            <div className="md:w-1/2 w-full p-5 flex flex-col space-y-6 rounded-2xl bg-[#414141] h-1/2 md:h-full min-w-0 overflow-y-auto">
                                                 <h3 className="text-xl font-bold mb-5">
                                                     {format(selectedDate, 'EEEE, PPP', { locale: pl })}
                                                 </h3>
 
                                                 {selectedDateEvents.length > 0 ? (
-                                                    <div className="h-full overflow-y-auto">
-                                                        {selectedDateEvents.map((event, index) => (
-                                                            <div
-                                                                key={index}
-                                                                className="flex items-center justify-between bg-[#515151] p-4 rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 mb-2"
-                                                            >
-                                                                <div className="flex items-center gap-3">
-                                                                    <div
-                                                                        className={`w-10 h-10 flex items-center justify-center rounded-full font-bold`}
-                                                                        style={{
-                                                                            backgroundColor: event.category?.colorHex || 'var(--color-gray-400)',
-                                                                        }}
-                                                                    >
-                                                                        {React.createElement(
-                                                                            Icons[event.category?.iconName || 'BadgeAlert'], // Use category icon or fallback to BadgeAlert
-                                                                            { className: 'text-white w-6 h-6' }
-                                                                        )}
-                                                                    </div>
-                                                                    <div>
-                                                                        <div className="flex items-center gap-2">
-                                                                            <span className="flex items-center gap-2">
-                                                                                <button
-                                                                                    className={`mr-2 cursor-pointer w-5 h-5`}
-                                                                                    onClick={() =>
-                                                                                        updateTaskStatus(
-                                                                                            event.taskId,
-                                                                                            event.status == 2 ? 0 : 2
-                                                                                        )
-                                                                                    }
-                                                                                    title={
-                                                                                        event.status == 2
-                                                                                            ? 'Oznacz jako niezrobione'
-                                                                                            : 'Oznacz jako zrobione'
-                                                                                    }
-                                                                                >
-                                                                                    <CheckCircle
-                                                                                        className={`${event.status == 2
-                                                                                                ? 'text-green-500'
-                                                                                                : 'text-gray-500'
-                                                                                            } w-5 h-5`}
-                                                                                    />
-                                                                                </button>
-
-                                                                                <h4
-                                                                                    className={`text-xs md:text-lg text-[#E8E8E8] ${event.status == 2
-                                                                                            ? 'line-through'
-                                                                                            : ''
-                                                                                        }`}
-                                                                                >
-                                                                                    {event.title}
-                                                                                </h4>
-                                                                                {event.status == 1 && (
-                                                                                    <Clock
-                                                                                        className="text-yellow-500 w-4 h-4"
-                                                                                        title="W trakcie"
-                                                                                    />
-                                                                                )}
-                                                                            </span>
-
-                                                                            <span className="flex items-center">
-                                                                                <AlertCircle
-                                                                                    className={`w-4 h-4 ${event.priority == 2
-                                                                                            ? 'text-red-500'
-                                                                                            : event.priority == 1
-                                                                                                ? 'text-yellow-500'
-                                                                                                : 'text-green-500'
-                                                                                        }`}
-                                                                                    title="Ważność"
-                                                                                />
-                                                                            </span>
-                                                                        </div>
-                                                                        <p className="text-xs md:text-sm text-gray-400">
-                                                                            {format(new Date(event.start), 'HH:mm', {
-                                                                                locale: pl,
-                                                                            })}
-                                                                        </p>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        ))}
-                                                    </div>
+                                                        <div className="h-full overflow-y-auto">
+                                                            {selectedDateEvents.map((event) => (
+                                                                <TaskCard key={event.taskId} task={event} />
+                                                            ))}
+                                                        </div>
                                                 ) : (
                                                     <p className="flex text-gray-500 mt-2 justify-center items-center h-full w-full">
                                                         Brak wydarzeń na ten dzień.

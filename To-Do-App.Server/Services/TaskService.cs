@@ -37,9 +37,15 @@ namespace To_Do_App.Server.Services
             {
                 task.CreatedAt = DateTime.UtcNow;
 
+
                 if (task.DueDate.HasValue)
                 {
                     task.DueDate = DateTime.SpecifyKind(task.DueDate.Value, DateTimeKind.Local);
+                }
+
+                if (task.DoneDate.HasValue)
+                {
+                    task.DoneDate = DateTime.SpecifyKind(task.DoneDate.Value, DateTimeKind.Local);
                 }
 
                 _context.Tasks.Add(task);
@@ -73,6 +79,11 @@ namespace To_Do_App.Server.Services
                 if (existingTask.DueDate.HasValue)
                 {
                     existingTask.DueDate = DateTime.SpecifyKind(existingTask.DueDate.Value, DateTimeKind.Local);
+                }
+
+                if (existingTask.DoneDate.HasValue)
+                {
+                    existingTask.DoneDate = DateTime.SpecifyKind(existingTask.DoneDate.Value, DateTimeKind.Local);
                 }
 
                 _context.Tasks.Update(existingTask);
