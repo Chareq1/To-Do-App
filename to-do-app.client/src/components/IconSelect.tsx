@@ -1,12 +1,14 @@
 ﻿import React from "react";
 import * as Icons from "lucide-react";
 
+// Definiowanie opcji ikon 
 const iconOptions = Object.keys(Icons).map((iconName) => ({
     label: iconName,
     value: iconName,
     icon: Icons[iconName as keyof typeof Icons],
 }));
 
+// Komponent do wyboru ikony (z listy rozwijanej)
 function IconSelect({
     value,
     onChange,

@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace To_Do_App.Server.Models
 {
+    // Model tabeli dla kategorii
     [Table("Categories")]
     public class Category
     {

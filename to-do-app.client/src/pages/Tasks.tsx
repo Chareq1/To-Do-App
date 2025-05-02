@@ -12,6 +12,7 @@ import * as Icons from 'lucide-react';
 import IconSelect from '../components/IconSelect';
 import { CheckCircle, Clock, XCircle, AlertCircle } from 'lucide-react';
 
+// Interfejs do reprezentacji zasobów
 interface Resource {
     resourceId: string;
     resourceType: string;
@@ -21,6 +22,7 @@ interface Resource {
     uploadDate: Date;
 }
 
+// Interfejs do reprezentacji kategorii
 interface Category {
     categoryId: string;
     colorHex: string;
@@ -29,6 +31,7 @@ interface Category {
     name: string;
 }
 
+// Interfejs do reprezentacji zadań
 interface Task {
     taskId: string;
     name: string;
@@ -43,7 +46,9 @@ interface Task {
     resources: Resource[];
 }
 
+// Strona do zarządzania zadaniami
 function Tasks() {
+    // Wszystkie potrzebne hooki i stany
     const { user, loggingOut } = useUser();
     const [isLoading, setIsLoading] = useState(false);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -57,7 +62,7 @@ function Tasks() {
     const [button, setButton] = useState(<><Plus className="w-5 h-5 lg:mr-2" /><p className="block">Dodaj</p></>);
     const [error, setError] = useState<string | null>(null);
 
-    // Fetch categories and tasks
+    // Efekt do ładowania danych
     useEffect(() => {
         setIsLoading(true);
         document.body.classList.add("bg-[#212121]");
@@ -83,20 +88,26 @@ function Tasks() {
             });
     }, [user]);
 
+    // Funkcja do pobierania kategorii
     const fetchCategories = async () => {
         const response = await fetch(`/api/Category/user/${user?.userId}`);
 
         if (!response.ok) {
-            throw new Error('Failed to fetch categories');
+            alert("Nie udało się pobrać kategorii!");
+            const errorData = await response.json();
+            throw new Error(errorData.message);
         }
         return response.json();
     };
 
+    // Funkcja do pobierania zadań
     const fetchTasks = async () => {
         const response = await fetch(`/api/Task/user/${user?.userId}`);
 
         if (!response.ok) {
-            throw new Error('Failed to fetch tasks');
+            alert("Nie udało się pobrać zadań!");
+            const errorData = await response.json();
+            throw new Error(errorData.message);
         }
         const tasks = await response.json();
 
@@ -107,7 +118,9 @@ function Tasks() {
                 ]);
 
                 if (!resourcesResponse.ok) {
-                    throw new Error('Failed to fetch task details');
+                    alert("Nie udało się pobrać plików!");
+                    const errorData = await resourcesResponse.json();
+                    throw new Error(errorData.message);
                 }
 
                 const resources = await resourcesResponse.json();
@@ -119,12 +132,14 @@ function Tasks() {
         return tasksWithDetails;
     };
 
+    // Funkcja do otwierania panelu
     const openPanel = (content: string, data: any = null) => {
         setPanelContent(content);
         setPanelData(data);
         setIsPanelOpen(true);
     };
 
+    // Funkcja do zamykania panelu
     const closePanel = () => {
         setIsPanelOpen(false);
         setPanelContent(null);
@@ -132,6 +147,7 @@ function Tasks() {
         setError(null);
     };
 
+    // Funkcja do obsługi przesyłania pliku
     const handleUploadFile = async (file: File, taskId: string) => {
         const formData = new FormData();
         formData.append("file", file);
@@ -144,17 +160,19 @@ function Tasks() {
             });
 
             if (!response.ok) {
-                throw new Error("Failed to upload file");
+                alert("Nie udało się przesłać pliku!");
+                const errorData = await response.json();
+                throw new Error(errorData.message);
             }
 
-            // Fetch updated resources
             const updatedResourcesResponse = await fetch(`/api/Resource/task/${taskId}`);
             if (!updatedResourcesResponse.ok) {
-                throw new Error("Failed to fetch updated resources");
+                alert("Nie udało się pobrać zaktualizowanych plików!");
+                const errorData = await updatedResourcesResponse.json();
+                throw new Error(errorData.message);
             }
             const updatedResources = await updatedResourcesResponse.json();
 
-            // Update tasks state
             setTasks((prevTasks) =>
                 prevTasks.map((task) =>
                     task.taskId === taskId ? { ...task, resources: updatedResources } : task
@@ -168,10 +186,12 @@ function Tasks() {
                 }));
             }
         } catch (error) {
-            console.error("Error uploading file:", error);
+            alert("Nie udało się przesłać pliku!");
+            console.error("Błąd podczas przesyłania pliku:", error);
         }
     };
 
+    // Funkcja do obsługi pobierania pliku
     const handleDownloadFileFromURL = (filePath: string, fileName: string) => {
         try {
             const a = document.createElement("a");
@@ -180,13 +200,14 @@ function Tasks() {
             document.body.appendChild(a);
             a.click();
 
-            // Clean up
             document.body.removeChild(a);
         } catch (error) {
-            console.error("Error downloading file:", error);
+            alert("Nie udało się pobrać pliku!");
+            console.error("Błąd podczas pobierania pliku:", error);
         }
     };
 
+    // Funkcja do obsługi usuwania kategorii
     const handleDeleteCategory = async (categoryId: string, categoryName: string) => {
         const confirmDelete = window.confirm(`Czy na pewno chcesz usunąć kategorię: "${categoryName}"?`);
 
@@ -202,6 +223,7 @@ function Tasks() {
         setCategories(updatedCategories);
     };
 
+    // Funkcja do obsługi usuwania zadania
     const handleDeleteTask = async (taskId: string, taskName: string) => {
         const confirmDelete = window.confirm(`Czy na pewno chcesz usunąć zadanie: "${taskName}"?`);
 
@@ -217,6 +239,7 @@ function Tasks() {
         setTasks(updatedTasks);
     };
 
+    // Funkcja do obsługi usuwania zasobu
     const handleDeleteResource = async (resourceId: string, resourceName: string, taskId: string) => {
         const confirmDelete = window.confirm(`Czy na pewno chcesz usunąć plik: "${resourceName}"?`);
 
@@ -230,24 +253,25 @@ function Tasks() {
             });
 
             if (!response.ok) {
-                throw new Error("Failed to delete resource");
+                alert("Nie udało się usunąć pliku!");
+                const errorData = await response.json();
+                throw new Error(errorData.message);
             }
 
-            // Fetch updated resources
             const updatedResourcesResponse = await fetch(`/api/Resource/task/${taskId}`);
             if (!updatedResourcesResponse.ok) {
-                throw new Error("Failed to fetch updated resources");
+                alert("Nie udało się pobrać zaktualizowanych plików!");
+                const errorData = await updatedResourcesResponse.json();
+                throw new Error(errorData.message);
             }
             const updatedResources = await updatedResourcesResponse.json();
 
-            // Update tasks state
             setTasks((prevTasks) =>
                 prevTasks.map((task) =>
                     task.taskId === taskId ? { ...task, resources: updatedResources } : task
                 )
             );
 
-            // Update panelData if the current task is being viewed
             if (panelData?.taskId === taskId) {
                 setPanelData((prevPanelData) => ({
                     ...prevPanelData,
@@ -255,10 +279,12 @@ function Tasks() {
                 }));
             }
         } catch (error) {
-            console.error("Error deleting resource:", error);
+            alert("Nie udało się usunąć pliku!");
+            console.error("Błąd podczas usuwania pliku:", error);
         }
     };
 
+    // Funkcja do aktualizacji statusu zadania
     const updateTaskStatus = async (taskId: string, newStatus) => {
         try {
             const patchDoc = [
@@ -275,16 +301,20 @@ function Tasks() {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to update task status');
+                alert("Nie udało się zaktualizować statusu zadania!");
+                const errorData = await response.json();
+                throw new Error(errorData.message);
             }
 
             const updatedTasks = await fetchTasks();
             setTasks(updatedTasks);
         } catch (error) {
-            console.error('Error updating task status:', error);
+            alert("Nie udało się zaktualizować statusu zadania!");
+            console.error("Błąd podczas aktualizacji statusu zadania:", error);
         }
     };
 
+    // Funkcja do przełączania stanu rozwinięcia kategorii
     const toggleCategoryCollapse = (categoryId: string) => {
         setCollapsedCategories((prev) =>
             prev.includes(categoryId)
@@ -293,6 +323,7 @@ function Tasks() {
         );
     };
 
+    // Funkcja do renderowania karty zadania
     const TaskCard = ({ task }: { task: any }) => {
         const isOutOfDate = task.dueDate && new Date(task.dueDate) < new Date() && task.status !== 2;
 
@@ -360,7 +391,6 @@ function Tasks() {
                     </div>
                 </div>
 
-                {/* Action Buttons */}
                 <div className="flex gap-2 ml-5">
                     <button
                         className="text-blue-500 cursor-pointer hover:text-blue-600"
@@ -398,6 +428,7 @@ function Tasks() {
 
             <div className="flex flex-col w-full pb-5 pt-5 pr-5 text-[#E8E8E8] max-h-screen min-h-screen">
                 <div className="flex flex-col h-full w-full bg-[#313131] rounded-xl overflow-hidden">
+                    {/* Nagłówek */}
                     <div className="p-5 w-full flex justify-between items-center">
                         <h1 className="font-bold text-4xl">Zadania</h1>
 
@@ -426,7 +457,7 @@ function Tasks() {
                             </div>
                         ) : (
                             <>
-                                {/* Render categories */}
+                                {/* Renderowanie kategorii i zadań */}
                                 {categories.map((category) => (
                                     <div key={category.categoryId} className="mb-5 bg-[#414141] rounded-2xl p-5">
                                         <div className="flex items-center justify-between">
@@ -499,6 +530,7 @@ function Tasks() {
                                     </div>
                                 ))}
 
+                                {/* Renderowanie zadań bez kategorii */}
                                 <div className="bg-[#414141] rounded-2xl p-5 w-full">
                                     <div className="flex items-center justify-between">
                                         <div
@@ -549,6 +581,7 @@ function Tasks() {
                     </div>
                 </div>
             </div>
+            {/* Panel boczny do dodawania/edycji zadań i kategorii */}
             <SlidingPane
                 isOpen={isPanelOpen}
                 title={

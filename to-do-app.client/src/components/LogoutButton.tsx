@@ -2,6 +2,7 @@
 import { useUser } from '../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 
+// Komponent przycisku wylogowania
 function LogoutButton() {
     const { logout } = useUser();
     const navigate = useNavigate();

@@ -6,25 +6,31 @@ using To_Do_App.Server.Services.Interfaces;
 
 namespace To_Do_App.Server.Services
 {
+    // Klasa usługi dla zasobów
     public class ResourceService : IResourceService
     {
+        // Deklaracja kontekstu bazy danych
         private readonly ApplicationDbContext _context;
 
+        // Konstruktor
         public ResourceService(ApplicationDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
+        // Metoda do pobierania wszystkich zasobów
         public async Task<IEnumerable<Resource>> GetResources()
         {
             return await _context.Resources.ToListAsync();
         }
 
+        // Metoda do pobierania zasobu po identyfikatorze
         public async Task<Resource?> GetResource(Guid resourceId)
         {
             return await _context.Resources.FirstOrDefaultAsync(r => r.ResourceId == resourceId);
         }
 
+        // Metoda do dodawania nowego zasobu
         public async Task<Resource> AddResource(Resource resource)
         {
             if (resource == null)
@@ -44,6 +50,7 @@ namespace To_Do_App.Server.Services
             }
         }
 
+        // Metoda do aktualizacji zasobu
         public async System.Threading.Tasks.Task UpdateResource(Guid resourceId, JsonPatchDocument<Resource> patchDoc)
         {
             if (patchDoc == null)
@@ -71,6 +78,7 @@ namespace To_Do_App.Server.Services
             }
         }
 
+        // Metoda do usuwania zasobu
         public async System.Threading.Tasks.Task DeleteResource(Guid resourceId)
         {
             try
@@ -100,16 +108,10 @@ namespace To_Do_App.Server.Services
             }
         }
 
-
-        //GET
+        // Metoda do pobierania zasobów po identyfikatorze zadania
         public async Task<IEnumerable<Resource>> GetResourcesByTask(Guid taskId)
         {
             return await _context.Resources.Where(r => r.TaskId == taskId).ToListAsync();
-        }
-
-        public async Task<IEnumerable<Resource>> GetResourcesByType(String type)
-        {
-            return await _context.Resources.Where(r => r.ResourceType == type).ToListAsync();
         }
     }
 }

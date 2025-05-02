@@ -9,25 +9,31 @@ using System.Diagnostics;
 
 namespace To_Do_App.Server.Services
 {
+    // Klasa usługi dla użytkowników
     public class UserService : IUserService
     {
+        // Deklaracja kontekstu bazy danych
         private readonly ApplicationDbContext _context;
 
+        // Konstruktor
         public UserService(ApplicationDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
+        // Metoda do pobierania wszystkich użytkowników
         public async Task<IEnumerable<User>> GetUsers()
         {
             return await _context.Users.ToListAsync();
         }
 
+        // Metoda do pobierania użytkownika po identyfikatorze
         public async Task<User?> GetUser(Guid userId)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.UserId == userId);
         }
 
+        // Metoda do pobierania użytkownika po identyfikatorze
         public async Task<User> AddUser(User user)
         {
             if (user == null)
@@ -53,6 +59,7 @@ namespace To_Do_App.Server.Services
             }
         }
 
+        // Metoda do aktualizacji użytkownika
         public async System.Threading.Tasks.Task UpdateUser(Guid userId, JsonPatchDocument<User> patchDoc)
         {
             try
@@ -91,6 +98,7 @@ namespace To_Do_App.Server.Services
             }
         }
 
+        // Metoda do usuwania użytkownika
         public async System.Threading.Tasks.Task DeleteUser(Guid userId)
         {
             try
@@ -125,24 +133,16 @@ namespace To_Do_App.Server.Services
             }
         }
 
+        // Metoda do pobierania użytkownika po nazwie użytkownika
         public async Task<User?> GetUserByUsername(String username)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
         }
 
+        // Metoda do pobierania użytkownika po adresie e-mail
         public async Task<User?> GetUserByEmail(String email)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-        }
-
-        public async Task<User?> GetUserByUsernameAndPassword(String username, String password)
-        {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Username == username && u.Password == password);
-        }
-
-        public async Task<User?> GetUserByEmailAndPassword(String email, String password)
-        {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Password == password);
         }
 
         public bool VerifyPassword(String hash, String password)

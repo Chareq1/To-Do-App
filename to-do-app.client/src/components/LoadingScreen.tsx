@@ -1,6 +1,7 @@
 ﻿import { Notebook } from "lucide-react";
 import { useEffect } from 'react';
 
+// Komponent ekranu ładowania
 function LoadingScreen() {
     useEffect(() => {
         document.body.classList.replace("bg-[#ffffff]", "bg-[#63c5da]");

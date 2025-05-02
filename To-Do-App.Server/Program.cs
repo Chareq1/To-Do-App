@@ -5,12 +5,10 @@ using To_Do_App.Server.Services.Interfaces;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Text;
-using Microsoft.OpenApi.Models; // Add this using directive
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddDbContext<ApplicationDbContext>(
     options =>
     {

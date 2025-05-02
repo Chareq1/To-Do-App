@@ -10,15 +10,16 @@ import Register from './pages/Register';
 import User from './pages/User';
 import LoadingScreen from './components/LoadingScreen';
 
+// Komponent główny aplikacji
 function App() {
-    const { user, initialLoading } = useUser(); // Use initialLoading to wait for auth state
-    const location = useLocation(); // Get the current location
-
-    // Show a loading screen while the authentication state is being determined
+    // Wszystkie potrzebne hooki i stany
+    const { user, initialLoading } = useUser();
+    const location = useLocation();
     if (initialLoading) {
         return <LoadingScreen />;
     }
 
+    // Ścieżki do routingu
     return (
         <Routes>
             <Route path="/">

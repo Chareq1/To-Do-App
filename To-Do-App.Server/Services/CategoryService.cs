@@ -6,25 +6,31 @@ using To_Do_App.Server.Services.Interfaces;
 
 namespace To_Do_App.Server.Services
 {
+    // Klasa usługi dla kategorii
     public class CategoryService : ICategoryService
     {
+        // Deklaracja kontekstu bazy danych
         private readonly ApplicationDbContext _context;
 
+        // Konstruktor
         public CategoryService(ApplicationDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context)); ;
         }
 
+        // Metoda do pobierania wszystkich kategorii dla danego użytkownika
         public async Task<IEnumerable<Category>> GetCategories(Guid userId)
         {
             return await _context.Categories.Where(c => c.UserId == userId).ToListAsync();
         }
 
+        // Metoda do pobierania kategorii po identyfikatorze
         public async Task<Category?> GetCategory(Guid categoryId)
         {
             return await _context.Categories.FirstOrDefaultAsync(c => c.CategoryId == categoryId);
         }
 
+        // Metoda do dodawania nowej kategorii
         public async Task<Category> AddCategory(Category category)
         {
             if (category == null)
@@ -43,6 +49,7 @@ namespace To_Do_App.Server.Services
             }
         }
 
+        // Metoda do aktualizacji kategorii
         public async System.Threading.Tasks.Task UpdateCategory(Guid categoryId, JsonPatchDocument<Category> patchDoc)
         {
             if (patchDoc == null)
@@ -70,6 +77,7 @@ namespace To_Do_App.Server.Services
             }
         }
 
+        // Metoda do usuwania kategorii
         public async System.Threading.Tasks.Task DeleteCategory(Guid categoryId) {
             try
             {
@@ -91,13 +99,6 @@ namespace To_Do_App.Server.Services
             {
                 throw new DbUpdateException("Nie można usunąć kategorii z bazy danych!", ex);
             }
-        }
-
-
-        //GET
-        public async Task<IEnumerable<Category>> GetCategoriesByName(Guid userId, string name)
-        {
-            return await _context.Categories.Where(c => c.UserId == userId && c.Name == name).ToListAsync();
         }
     }
 }

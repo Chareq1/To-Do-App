@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace To_Do_App.Server.Models
 {
+    // Model tabeli dla plików
     [Table("Resources")]
     public class Resource
     {

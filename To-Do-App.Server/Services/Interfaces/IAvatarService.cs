@@ -3,6 +3,7 @@ using To_Do_App.Server.Models;
 
 namespace To_Do_App.Server.Services.Interfaces
 {
+    // Interfejs usługi dla avatarów
     public interface IAvatarService
     {
         public Task<IEnumerable<Avatar>> GetAvatars();

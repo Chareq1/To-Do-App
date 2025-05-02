@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace To_Do_App.Server.Models
 {
+    // Model tabeli dla avatarów
     [Table("Avatars")]
     public class Avatar
     {

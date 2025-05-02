@@ -22,6 +22,7 @@ import {
 import { pl } from 'date-fns/locale';
 import React from 'react';
 
+// Interfejs do reprezentacji wydarzenia
 interface Event {
     title: string;
     start: Date;
@@ -30,7 +31,9 @@ interface Event {
     resource?: any;
 }
 
+// Strona kalendarza
 function Calendar() {
+    // Wszystkie potrzebne hooki i stany
     const { user, loggingOut } = useUser();
     const [isLoading, setIsLoading] = useState(false);
     const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -38,25 +41,33 @@ function Calendar() {
     const [events, setEvents] = useState<Event[]>([]);
     const [categories, setCategories] = useState([]);
 
+    // Efekt do ustawienia tła strony i ładowania danych kalendarza
     useEffect(() => {
         document.body.classList.add("bg-[#212121]");
         document.body.classList.replace("bg-[#ffffff]", "bg-[#212121]");
 
+        // Funkcja do pobierania danych kalendarza
         const fetchCalendarData = async () => {
             setIsLoading(true);
 
             try {
                 const taskResponse = await fetch(`/api/Task/user/${user?.userId}`);
                 if (!taskResponse.ok) {
-                    throw new Error('Failed to fetch tasks');
+                    alert("Nie udało się pobrać zadań!");
+                    const errorData = await taskResponse.json();
+                    throw new Error(errorData.message);
                 }
+
                 const tasks = await taskResponse.json();
 
                 const categoryResponse = await fetch(`/api/Category/user/${user?.userId}`);
 
                 if (!categoryResponse.ok) {
-                    throw new Error('Failed to fetch categories');
+                    alert("Nie udało się pobrać kategorii!");
+                    const errorData = await categoryResponse.json();
+                    throw new Error(errorData.message);
                 }
+
                 const categories = await categoryResponse.json();
 
                 const transformedEvents = tasks.map((task: any) => {
@@ -76,7 +87,8 @@ function Calendar() {
                 setEvents(transformedEvents);
                 setCategories(categories);
             } catch (error) {
-                console.error('Error fetching calendar data:', error);
+                alert("Nie udało się pobrać danych kalendarza!");
+                console.error("Błąd pobierania danych kalendarza: ", error);
             } finally {
                 setTimeout(() => {
                     setIsLoading(false);
@@ -87,6 +99,7 @@ function Calendar() {
         fetchCalendarData();
     }, [user]);
 
+    // Funkcja do aktualizacji statusu zadania
     const updateTaskStatus = async (taskId: string, newStatus) => {
         try {
             const patchDoc = [
@@ -103,13 +116,17 @@ function Calendar() {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to update task status');
+                alert("Nie udało się zaktualizować statusu zadania!");
+                const errorData = await response.json();
+                throw new Error(errorData.message);
             }
 
             const taskResponse = await fetch(`/api/Task/user/${user?.userId}`);
 
             if (!taskResponse.ok) {
-                throw new Error('Failed to fetch tasks');
+                alert("Nie udało się pobrać zadań!");
+                const errorData = await taskResponse.json();
+                throw new Error(errorData.message);
             }
 
             const tasks = await taskResponse.json();
@@ -130,10 +147,12 @@ function Calendar() {
 
             setEvents(transformedEvents);
         } catch (error) {
-            console.error('Error updating task status:', error);
+            alert("Nie udało się zaktualizować statusu zadania!");
+            console.error("Błąd aktualizacji statusu zadania: ", error);
         }
     };
 
+    // Funkcja do renderowania nagłówka kalendarza
     const renderHeader = () => (
         <div className="flex justify-center items-center py-4 px-2 gap-x-10">
             <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="items-center justify-center text-white p-2 bg-[#2775EE] hover:bg-[#0F52BA] md:text-base lg:text-lg shadow-[0px_9px_30px_rgba(0,0,0,0.3)] cursor-pointer rounded-full"><ChevronLeft /></button>
@@ -142,6 +161,7 @@ function Calendar() {
         </div>
     );
 
+    // Funkcja do renderowania dni tygodnia
     const renderDays = () => {
         const dayNames = ['PN', 'WT', 'ŚR', 'CZ', 'PT', 'SB', 'ND'];
 
@@ -156,6 +176,7 @@ function Calendar() {
         );
     };
 
+    // Funkcja do obsługi kliknięcia w datę
     const onDateClick = (day) => {
         setSelectedDate(day);
 
@@ -164,6 +185,7 @@ function Calendar() {
         }
     };
 
+    // Funkcja do renderowania komórek kalendarza
     const renderCells = () => {
         const monthStart = startOfMonth(currentMonth);
         const monthEnd = endOfMonth(monthStart);
@@ -197,7 +219,7 @@ function Calendar() {
                     >
                         {format(day, 'd')}
                         {hasEvent && (
-                            <div className={`absolute bottom-1.5 left-1/2 transform -translate-x-1/2 ${isSelected ? "bg-white" : "bg-[#2775EE]" } w-1.5 h-1.5 rounded-full`}></div>
+                            <div className={`absolute bottom-1.5 left-1/2 transform -translate-x-1/2 ${isSelected ? "bg-white" : "bg-[#2775EE]"} w-1.5 h-1.5 rounded-full`}></div>
                         )}
                     </div>
                 );
@@ -214,10 +236,12 @@ function Calendar() {
         return <div>{rows}</div>;
     };
 
+    // Funkcja do renderowania wydarzeń na wybrany dzień
     const selectedDateEvents = events.filter(
         (event) => isSameDay(new Date(event.start), selectedDate)
     );
 
+    // Funkcja do renderowania karty zadania
     const TaskCard = ({ task }: { task: any }) => {
         const taskTime = task.start ? format(new Date(task.start), 'HH:mm', { locale: pl }) : null;
         const isOutOfDate = task.start && new Date(task.start) < new Date() && task.status !== 2;
@@ -228,7 +252,6 @@ function Calendar() {
                 className="flex items-center justify-between bg-[#515151] p-4 rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 mb-2 w-full"
             >
                 <div className="flex items-center gap-4 w-full">
-                    {/* Badge */}
                     <div
                         className="w-12 h-12 flex items-center justify-center rounded-full font-bold shrink-0"
                         style={{
@@ -241,7 +264,6 @@ function Calendar() {
                         )}
                     </div>
 
-                    {/* Task Details */}
                     <div className="flex flex-col w-full">
                         <div className="flex items-center gap-2 w-full">
                             <button
@@ -260,8 +282,8 @@ function Calendar() {
                             >
                                 <CheckCircle
                                     className={`w-5 h-5 ${task.status === 2
-                                            ? 'text-green-500'
-                                            : 'text-gray-500'
+                                        ? 'text-green-500'
+                                        : 'text-gray-500'
                                         }`}
                                 />
                             </button>
@@ -300,7 +322,6 @@ function Calendar() {
                             </div>
                         </div>
 
-                        {/* Time and Priority Indicator */}
                         <div className="flex items-center justify-between">
                             {taskTime && (
                                 <p className="text-xs md:text-sm text-gray-400">
@@ -318,61 +339,62 @@ function Calendar() {
     return loggingOut ? (
         <LoadingScreen />
     ) : (
-            <div className="flex w-full min-h-screen max-h-screen flex-row font-[Ubuntu] overflow-y-auto">
-                <div className="p-5">
-                    <Navigation />
-                </div>
-                <div className="flex flex-col w-full pb-5 pt-5 pr-5 text-[#E8E8E8] max-h-screen min-h-screen">
-                    <div className="flex flex-col h-full w-full bg-[#313131] rounded-xl overflow-hidden">
-                        <div className="p-5 w-full">
-                            <h1 className="font-bold text-4xl h-full">Kalendarz</h1>
-                        </div>
-                        <div className="w-full h-full flex flex-col justify-start items-center md:justify-center overflow-y-auto p-5">
-                            {isLoading ? (
-                                <div
-                                    role="status"
-                                    className="flex items-center justify-center w-full h-full"
-                                >
-                                    <Notebook className="animate-bounce size-1/4 text-[#E8E8E8]" />
-                                    <span className="sr-only">Ładowanie...</span>
-                                </div>
-                            ) : (
-                                <>
-                                    <div className="w-full flex items-center justify-center h-full overflow-x-auto">
-                                        <div className="flex flex-col md:flex-row w-full rounded-lg gap-y-5 md:gap-x-5 h-full p-5 min-w-0">
-                                            {/* Calendar Section */}
-                                            <div className="md:w-1/2 w-full p-6 flex flex-col space-y-6 h-1/2 md:h-full rounded-2xl bg-[#414141] justify-center overflow-x-auto min-w-0">
-                                                {renderHeader()}
-                                                {renderDays()}
-                                                <div className="overflow-x-auto">{renderCells()}</div>
-                                            </div>
+        <div className="flex w-full min-h-screen max-h-screen flex-row font-[Ubuntu] overflow-y-auto">
+            <div className="p-5">
+                <Navigation />
+            </div>
+            <div className="flex flex-col w-full pb-5 pt-5 pr-5 text-[#E8E8E8] max-h-screen min-h-screen">
+                <div className="flex flex-col h-full w-full bg-[#313131] rounded-xl overflow-hidden">
+                    {/* Nagłówek */}
+                    <div className="p-5 w-full">
+                        <h1 className="font-bold text-4xl h-full">Kalendarz</h1>
+                    </div>
+                    <div className="w-full h-full flex flex-col justify-start items-center md:justify-center overflow-y-auto p-5">
+                        {isLoading ? (
+                            <div
+                                role="status"
+                                className="flex items-center justify-center w-full h-full"
+                            >
+                                <Notebook className="animate-bounce size-1/4 text-[#E8E8E8]" />
+                                <span className="sr-only">Ładowanie...</span>
+                            </div>
+                        ) : (
+                            <>
+                                <div className="w-full flex items-center justify-center h-full overflow-x-auto">
+                                    <div className="flex flex-col md:flex-row w-full rounded-lg gap-y-5 md:gap-x-5 h-full p-5 min-w-0">
+                                        {/* Sekcja kalendarza */}
+                                        <div className="md:w-1/2 w-full p-6 flex flex-col space-y-6 h-1/2 md:h-full rounded-2xl bg-[#414141] justify-center overflow-x-auto min-w-0">
+                                            {renderHeader()}
+                                            {renderDays()}
+                                            <div className="overflow-x-auto">{renderCells()}</div>
+                                        </div>
 
-                                            {/* Event Section */}
-                                            <div className="md:w-1/2 w-full p-5 flex flex-col space-y-6 rounded-2xl bg-[#414141] h-1/2 md:h-full min-w-0 overflow-y-auto">
-                                                <h3 className="text-xl font-bold mb-5">
-                                                    {format(selectedDate, 'EEEE, PPP', { locale: pl })}
-                                                </h3>
+                                        {/* Sekcja wydarzeń */}
+                                        <div className="md:w-1/2 w-full p-5 flex flex-col space-y-6 rounded-2xl bg-[#414141] h-1/2 md:h-full min-w-0 overflow-y-auto">
+                                            <h3 className="text-xl font-bold mb-5">
+                                                {format(selectedDate, 'EEEE, PPP', { locale: pl })}
+                                            </h3>
 
-                                                {selectedDateEvents.length > 0 ? (
-                                                        <div className="h-full overflow-y-auto">
-                                                            {selectedDateEvents.map((event) => (
-                                                                <TaskCard key={event.taskId} task={event} />
-                                                            ))}
-                                                        </div>
-                                                ) : (
-                                                    <p className="flex text-gray-500 mt-2 justify-center items-center h-full w-full">
-                                                        Brak wydarzeń na ten dzień.
-                                                    </p>
-                                                )}
-                                            </div>
+                                            {selectedDateEvents.length > 0 ? (
+                                                <div className="h-full overflow-y-auto">
+                                                    {selectedDateEvents.map((event) => (
+                                                        <TaskCard key={event.taskId} task={event} />
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <p className="flex text-gray-500 mt-2 justify-center items-center h-full w-full">
+                                                    Brak wydarzeń na ten dzień.
+                                                </p>
+                                            )}
                                         </div>
                                     </div>
-                                </>
-                            )}
-                        </div>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
+        </div>
     );
 }
 

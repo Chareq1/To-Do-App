@@ -6,25 +6,31 @@ using To_Do_App.Server.Services.Interfaces;
 
 namespace To_Do_App.Server.Services
 {
+    // Klasa usługi dla avatarów
     public class AvatarService : IAvatarService
     {
+        // Deklaracja kontekstu bazy danych
         private readonly ApplicationDbContext _context;
 
+        // Konstruktor
         public AvatarService(ApplicationDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
+        // Metoda do pobierania wszystkich avatarów
         public async Task<IEnumerable<Avatar>> GetAvatars()
         {
             return await _context.Avatars.ToListAsync();
         }
 
+        // Metoda do pobierania avatara po identyfikatorze
         public async Task<Avatar?> GetAvatar(Guid avatarId)
         {
             return await _context.Avatars.FirstOrDefaultAsync(a => a.AvatarId == avatarId);
         }
 
+        // Metoda do dodawania nowego avatara
         public async Task<Avatar> AddAvatar(Avatar avatar)
         {
             if(avatar == null)
@@ -45,6 +51,7 @@ namespace To_Do_App.Server.Services
             }
         }
 
+        // Metoda do aktualizacji avatara
         public async System.Threading.Tasks.Task UpdateAvatar(Guid avatarId, JsonPatchDocument<Avatar> patchDoc)
         {
             if (patchDoc == null)
@@ -72,6 +79,7 @@ namespace To_Do_App.Server.Services
             }
         }
 
+        // Metoda do usuwania avatara
         public async System.Threading.Tasks.Task DeleteAvatar(Guid avatarId)
         {
             try
@@ -100,6 +108,7 @@ namespace To_Do_App.Server.Services
             }
         }
 
+        // Metoda do pobierania domyślnego avatara
         public async Task<Avatar?> GetDefaultAvatar()
         {
             return await _context.Avatars.FirstOrDefaultAsync(a => a.FileName == "default.png");

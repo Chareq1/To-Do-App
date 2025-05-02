@@ -9,13 +9,13 @@ const rootElement = document.getElementById('root')!;
 rootElement.className = "w-full p-0 m-0 h-full";
 
 createRoot(rootElement).render(
-        <UserProvider>
-            <BrowserRouter>
-                <div className="flex justify-center items-center content-center w-full min-h-screen">
-                    <App />
-                </div>
-            </BrowserRouter>
-        </UserProvider>
+    <UserProvider>
+        <BrowserRouter>
+            <div className="flex justify-center items-center content-center w-full min-h-screen">
+                <App />
+            </div>
+        </BrowserRouter>
+    </UserProvider>
 )
 
 

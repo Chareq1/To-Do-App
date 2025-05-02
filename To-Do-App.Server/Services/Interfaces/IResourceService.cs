@@ -3,6 +3,7 @@ using To_Do_App.Server.Models;
 
 namespace To_Do_App.Server.Services.Interfaces
 {
+    // Interfejs usługi dla zasobów
     public interface IResourceService
     {
         public Task<IEnumerable<Resource>> GetResources();
@@ -11,6 +12,5 @@ namespace To_Do_App.Server.Services.Interfaces
         public System.Threading.Tasks.Task UpdateResource(Guid resourceId, JsonPatchDocument<Resource> patchDoc);
         public System.Threading.Tasks.Task DeleteResource(Guid resourceId);
         public Task<IEnumerable<Resource>> GetResourcesByTask(Guid taskId);
-        public Task<IEnumerable<Resource>> GetResourcesByType(String type);
     }
 }

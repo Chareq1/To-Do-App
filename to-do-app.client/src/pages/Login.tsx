@@ -4,7 +4,9 @@ import { useNavigate, Navigate, Link } from "react-router-dom";
 import { Notebook, LogIn } from "lucide-react";
 import LoadingScreen from "../components/LoadingScreen";
 
+// Strona logowania
 const Login = () => {
+    // Wszystkie potrzebne hooki i stany
     const { user, login, loading, initialLoading } = useUser();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -15,6 +17,7 @@ const Login = () => {
 
     const navigate = useNavigate();
 
+    // Efekt do ustawienia tła strony
     useEffect(() => {
         document.body.classList.add("bg-[#212121]");
         document.body.classList.replace("bg-[#ffffff]", "bg-[#212121]");
@@ -28,14 +31,17 @@ const Login = () => {
         }
     }, [loading, user]);
 
+    // Sprawdzenie, czy użytkownik jest już zalogowany
     if (loading || initialLoading || authLoading) {
         return <LoadingScreen />;
     }
 
+    // Sprawdzenie, czy użytkownik jest już zalogowany
     if (user) {
         return <Navigate to="/" />;
     }
 
+    // Funkcja do obsługi logowania
     const handleLogin = async () => {
         try {
             setError(null);
@@ -71,7 +77,7 @@ const Login = () => {
 
     return (
         <div className="w-full flex items-center justify-center md:flex-row flex-col m-0 min-h-screen font-[Ubuntu]">
-            {/* Left Section with Image */}
+            {/* Lewa sekcja z obrazkiem */}
             <div className="w-full h-full md:h-screen rounded-xl items-center justify-center p-5 relative sm:flex-1 lg:flex-2 overflow-hidden">
                 <img src="/Resources/login1.jpg" className="rounded-xl object-cover h-full w-full" />
 
@@ -85,7 +91,7 @@ const Login = () => {
                 </div>
             </div>
 
-            {/* Right Section with Form */}
+            {/* Prawa sekcja z formularzem do logowania */}
             <div className="w-full bg-[#212121] rounded-2xl flex flex-col items-start justify-start md:items-center md:justify-center flex-1 text-left overflow-y-auto h-full p-5">
                 <div className="flex flex-col items-center justify-center w-full max-w-lg">
                     <label className="text-4xl text-[#e8e8e8] font-bold text-left w-3/4 pl-5 pb-10">Zaloguj się</label>

@@ -7,15 +7,16 @@ import Navigation from '../components/Navigation';
 import { useNavigate } from 'react-router-dom';
 import { Notebook, Settings, Trash2, Save } from 'lucide-react';
 
-// INTERFEJS AVATARA
+// Interfejs do reprezentacji avatara
 interface Avatar {
     avatarId: string;
     fileName: string;
     filePath: string;
 }
 
+// Strona użytkownika
 function User() {
-    // POLA
+    // Wszystkie potrzebne hooki i stany
     const { user, loggingOut, refreshData } = useUser();
     const [name, setName] = useState("");
     const [username, setUsername] = useState("");
@@ -34,7 +35,7 @@ function User() {
     const [isLoading, setIsLoading] = useState(false);
 
 
-    // Metoda do ładowania danych za każdym razem, gdy jakieś zmiany zajdą z użytkownikiem
+    // Efekt do ładowania danych użytkownika
     useEffect(() => {
         setIsLoading(true);
         document.body.classList.add("bg-[#212121]");
@@ -63,48 +64,45 @@ function User() {
         }, 1500);
     }, [user]);
 
-    // Obiekt do obsługi nawigacji
     const navigate = useNavigate();
 
-
-    // METODY
-    // Metoda do walidacji numeru telefonu
+    // Funkcja do walidacji numeru telefonu
     const validatePhone = (phone: string) => {
         const phoneRegex = /^[0-9]{9}$/;
         return phoneRegex.test(phone);
     };
 
-    // Metoda do walidacji adresu e-mail
+    // Funkcja do walidacji adresu e-mail
     const validateEmail = (email: string) => {
         const emailRegex = /^((?!\.)[\w-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/;
         return emailRegex.test(email);
     };
 
-    // Metoda do walidacji hasła
+    // Funkcja do walidacji hasła
     const validatePassword = (password: string) => {
         const passwordRegex = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,128}$/;
         return passwordRegex.test(password);
     };
 
-    // Metoda do walidacji imienia
+    // Funkcja do walidacji imienia
     const validateName = (name: string) => {
         const nameRegex = /^[A-Za-zęąóśżźćłĘĄÓŚŻŹĆŁ]+(?:[-' ][A-Za-zęąóśżźćłĘĄÓŚŻŹĆŁ]+)*$/;
         return nameRegex.test(name);
     };
 
-    // Metoda do walidacji nazwiska
+    // Funkcja do walidacji nazwiska
     const validateSurname = (surname: string) => {
         const surnameRegex = /^[A-Za-zęąóśżźćłĘĄÓŚŻŹĆŁ]+(?:[-' ][A-Za-zęąóśżźćłĘĄÓŚŻŹĆŁ]+)*$/;
         return surnameRegex.test(surname);
     };
 
-    // Metoda do obsługi usuwania konta
+    // Funkcja do obsługi usuwania konta
     const handleDelete = async () => {
         try {
             const confirmDelete = window.confirm("Czy na pewno chcesz usunąć swoje konto? Tej operacji nie można cofnąć.");
 
             if (!confirmDelete) {
-                return; 
+                return;
             }
 
             const response = await fetch(`/api/User/${user?.userId}`, {
@@ -132,7 +130,7 @@ function User() {
         }
     }
 
-    // Metoda do obsługi aktualizacji danych
+    // Funkcja do obsługi aktualizacji danych
     const handleUpdate = async () => {
         try {
             let patchDoc = [
@@ -148,7 +146,6 @@ function User() {
                 </>
             );
 
-            // WALIDACJA
             // Sprawdzenie, czy wszystkie wymagane pola są uzupełnione
             if (!username || !name || !surname || !email) {
                 setError(<>Wszystkie pola są wymagane!</>);
@@ -205,7 +202,6 @@ function User() {
                 return;
             }
 
-            // Dodawanie zmian, jeżeli jakiekolwiek zostały dokonane
             if (name != user?.name) {
                 patchDoc.push({ op: "replace", path: "/name", value: name });
             }
@@ -226,7 +222,6 @@ function User() {
                 patchDoc.push({ op: "replace", path: "/password", value: password });
             }
 
-            // Aktualizacja danych użytkownika
             const response = await fetch(`/api/User/${user?.userId}`, {
                 method: "PATCH",
                 headers: {
@@ -235,7 +230,6 @@ function User() {
                 body: JSON.stringify(patchDoc),
             });
 
-            // Sprawdzanie, czy wystąpił błąd
             if (!response.ok) {
                 const data = await response.json();
                 setError(<>{data.message}</>);
@@ -257,15 +251,13 @@ function User() {
         }
     };
 
-    // Metoda do wysyłania avataru na serwer
+    // Funkcja do wysyłania avatara na serwer
     const handleUploadAvatar = async () => {
-        // Sprawdzenie, czy włączony jest tryb edycji
         if (!isEditable) {
             const input = document.createElement("input");
             input.type = "file";
             input.accept = "image/*";
 
-            // Obsługa zmiany wejścia danych
             input.onchange = async (event: Event) => {
                 const target = event.target as HTMLInputElement;
                 if (target.files && target.files[0]) {
@@ -285,13 +277,11 @@ function User() {
                             </>
                         );
 
-                        // Wysłanie avatara na serwer
                         const avatarResponse = await fetch(`/api/Avatar?userId=${user?.userId}`, {
                             method: "POST",
                             body: formData,
                         });
 
-                        // Sprawdzenie, czy wystąpił jakiś błąd
                         if (!avatarResponse.ok) {
                             const avatarError = await avatarResponse.json();
                             setError(avatarError.message);
@@ -300,10 +290,8 @@ function User() {
                             return;
                         }
 
-                        // Wyciągnięcie danych o dodanym avatarze
                         const avatarData = await avatarResponse.json();
 
-                        // Aktualizacja identyfikatora u użytkownika
                         const patchDoc = [
                             { op: "replace", path: "/avatarId", value: avatarData.avatarId },
                         ];
@@ -316,7 +304,6 @@ function User() {
                             body: JSON.stringify(patchDoc),
                         });
 
-                        // Sprawdzenie, czy wystąpił jakiś błąd
                         if (!userResponse.ok) {
                             const userError = await userResponse.json();
                             setError(userError.message);
@@ -341,7 +328,7 @@ function User() {
         }
     };
 
-    // Metoda do obsługi trybu edycji
+    // Funkcja do obsługi trybu edycji
     const handleEditorial = () => {
         setIsEditable(!isEditable)
         setIsChecked(!isChecked);
@@ -366,186 +353,186 @@ function User() {
                         <div className="p-5 w-full">
                             <h1 className="font-bold text-4xl h-full">Użytkownik</h1>
                         </div>
-                            <div className="w-full h-full flex flex-col justify-start items-center md:justify-center overflow-y-auto p-5">
-                                {isLoading ? (
-                                    // Sprawdzenie stanu ładowania
-                                    <div
-                                        role="status"
-                                        className="flex items-center justify-center w-full h-full"
-                                    >
-                                        <Notebook className="animate-bounce size-1/4 text-[#E8E8E8]" />
-                                        <span className="sr-only">Ładowanie...</span>
-                                    </div>
-                                ) : (
-                                        <><div
-                                            className={`relative w-40 h-40 border-solid border-[#2775EE] border-5 rounded-full mb-5 md:mb-10 ${!isEditable ? "cursor-pointer group" : ""
+                        <div className="w-full h-full flex flex-col justify-start items-center md:justify-center overflow-y-auto p-5">
+                            {isLoading ? (
+                                // Sprawdzenie stanu ładowania
+                                <div
+                                    role="status"
+                                    className="flex items-center justify-center w-full h-full"
+                                >
+                                    <Notebook className="animate-bounce size-1/4 text-[#E8E8E8]" />
+                                    <span className="sr-only">Ładowanie...</span>
+                                </div>
+                            ) : (
+                                <><div
+                                    className={`relative w-40 h-40 border-solid border-[#2775EE] border-5 rounded-full mb-5 md:mb-10 ${!isEditable ? "cursor-pointer group" : ""
+                                        }`}
+                                    onClick={handleUploadAvatar}
+                                >
+                                    {avatar ? (
+                                        <img
+                                            src={`${avatar.filePath}${avatar.fileName}`}
+                                            alt="User Avatar"
+                                            style={{ aspectRatio: "1 / 1" }}
+                                            className={`w-full h-full rounded-full object-cover transition-opacity ${!isEditable ? "group-hover:opacity-20" : ""
                                                 }`}
-                                            onClick={handleUploadAvatar}
-                                        >
-                                            {avatar ? (
-                                                <img
-                                                    src={`${avatar.filePath}${avatar.fileName}`}
-                                                    alt="User Avatar"
-                                                    style={{ aspectRatio: "1 / 1" }}
-                                                    className={`w-full h-full rounded-full object-cover transition-opacity ${!isEditable ? "group-hover:opacity-20" : ""
-                                                        }`}
-                                                />
-                                            ) : (
-                                                <p>Ładowanie awatara...</p>
-                                            )}
+                                        />
+                                    ) : (
+                                        <p>Ładowanie awatara...</p>
+                                    )}
 
-                                            {!isEditable && (
-                                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <Settings className=" w-10 h-10 font-bold text-white" />
-                                                </div>
-                                            )}
+                                    {!isEditable && (
+                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <Settings className=" w-10 h-10 font-bold text-white" />
+                                        </div>
+                                    )}
+                                </div>
+
+                                    <form className="grid grid-cols-2 w-full items-center md:w-1/2 gap-x-4 px-4 overflow-y-auto">
+                                        <div className="flex flex-col col-span-2 xl:col-span-1 pl-5">
+                                            <label className="pb-1 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-full">Nazwa użytkownika</label>
+                                            <p className="">{username}</p>
                                         </div>
 
-                                            <form className="grid grid-cols-2 w-full items-center md:w-1/2 gap-x-4 px-4 overflow-y-auto">
-                                                <div className="flex flex-col col-span-2 xl:col-span-1 pl-5">
-                                                    <label className="pb-1 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-full">Nazwa użytkownika</label>
-                                                    <p className="">{username}</p>
-                                                </div>
+                                        <div className="col-span-2 pt-5 xl:col-span-1 xl:pt-0">
+                                            <label className="pl-5 pb-1 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-full">E-mail</label>
+                                            <input
+                                                type="email"
+                                                name="email"
+                                                placeholder="E-mail"
+                                                maxLength={320}
+                                                className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-full"
+                                                value={email}
+                                                readOnly={isEditable}
+                                                onChange={(e) => { setError(null); setEmail(e.target.value) }}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === "Enter")
+                                                        document.getElementsByName("name")[0].focus();
+                                                }} />
 
-                                                <div className="col-span-2 pt-5 xl:col-span-1 xl:pt-0">
-                                                    <label className="pl-5 pb-1 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-full">E-mail</label>
-                                                    <input
-                                                        type="email"
-                                                        name="email"
-                                                        placeholder="E-mail"
-                                                        maxLength={320}
-                                                        className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-full"
-                                                        value={email}
-                                                        readOnly={isEditable}
-                                                        onChange={(e) => { setError(null); setEmail(e.target.value) }}
-                                                        onKeyDown={(e) => {
-                                                            if (e.key === "Enter")
-                                                                document.getElementsByName("name")[0].focus();
-                                                        }}                                                    />
+                                        </div>
 
-                                                </div>
+                                        <div className="col-span-2 md:col-span-1 pt-5">
+                                            <label className="pl-5 pb-1 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-full">Imię</label>
+                                            <input
+                                                type="text"
+                                                name="name"
+                                                placeholder="Imię"
+                                                maxLength={255}
+                                                className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-full"
+                                                value={name}
+                                                readOnly={isEditable}
+                                                onChange={(e) => { setError(null); setName(e.target.value) }}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === "Enter")
+                                                        document.getElementsByName("surname")[0].focus();
+                                                }} />
+                                        </div>
 
-                                                <div className="col-span-2 md:col-span-1 pt-5">
-                                                    <label className="pl-5 pb-1 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-full">Imię</label>
-                                                    <input
-                                                        type="text"
-                                                        name="name"
-                                                        placeholder="Imię"
-                                                        maxLength={255}
-                                                        className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-full"
-                                                        value={name}
-                                                        readOnly={isEditable}
-                                                        onChange={(e) => { setError(null); setName(e.target.value) }}
-                                                        onKeyDown={(e) => {
-                                                            if (e.key === "Enter")
-                                                                document.getElementsByName("surname")[0].focus();
-                                                        }}                                                    />
-                                                </div>
+                                        <div className="col-span-2 md:col-span-1 pt-5">
+                                            <label className="pl-5 pb-1 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-full">Nazwisko</label>
+                                            <input
+                                                type="text"
+                                                name="surname"
+                                                placeholder="Nazwisko"
+                                                maxLength={255}
+                                                readOnly={isEditable}
+                                                className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-full"
+                                                value={surname}
+                                                onChange={(e) => { setError(null); setSurname(e.target.value) }}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === "Enter")
+                                                        document.getElementsByName("phone")[0].focus();
+                                                }} />
+                                        </div>
 
-                                                <div className="col-span-2 md:col-span-1 pt-5">
-                                                    <label className="pl-5 pb-1 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-full">Nazwisko</label>
-                                                    <input
-                                                        type="text"
-                                                        name="surname"
-                                                        placeholder="Nazwisko"
-                                                        maxLength={255}
-                                                        readOnly={isEditable}
-                                                        className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-full"
-                                                        value={surname}
-                                                        onChange={(e) => { setError(null); setSurname(e.target.value) }}
-                                                        onKeyDown={(e) => {
-                                                            if (e.key === "Enter")
-                                                                document.getElementsByName("phone")[0].focus();
-                                                        }}                                                    />
-                                                </div>
+                                        <div className="col-span-2 pt-5">
+                                            <label className="pl-5 pb-1 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-full">Telefon</label>
+                                            <input
+                                                type="tel"
+                                                name="phone"
+                                                placeholder="Telefon"
+                                                maxLength={9}
+                                                className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-full"
+                                                value={phone}
+                                                readOnly={isEditable}
+                                                onChange={(e) => { setError(null); setPhone(e.target.value) }}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === "Enter")
+                                                        document.getElementsByName("password")[0].focus();
+                                                }} />
+                                        </div>
 
-                                                <div className="col-span-2 pt-5">
-                                                    <label className="pl-5 pb-1 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-full">Telefon</label>
-                                                    <input
-                                                        type="tel"
-                                                        name="phone"
-                                                        placeholder="Telefon"
-                                                        maxLength={9}
-                                                        className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-full"
-                                                        value={phone}
-                                                        readOnly={isEditable}
-                                                        onChange={(e) => { setError(null); setPhone(e.target.value) }}
-                                                        onKeyDown={(e) => {
-                                                            if (e.key === "Enter")
-                                                                document.getElementsByName("password")[0].focus();
-                                                        }}                                                    />
-                                                </div>
+                                        <div className={`col-span-2 pt-5 md:col-span-1 ${isEditable ? "hidden" : ""}`}>
+                                            <label className="pl-5 pb-1 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-full">Hasło</label>
+                                            <input
+                                                type="password"
+                                                name="password"
+                                                minLength={8}
+                                                maxLength={128}
+                                                placeholder="Hasło"
+                                                className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-full"
+                                                value={password}
+                                                onChange={(e) => { setError(null); setPassword(e.target.value) }}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === "Enter")
+                                                        document.getElementsByName("confirmPassword")[0].focus();
+                                                }} />
+                                        </div>
 
-                                                <div className={`col-span-2 pt-5 md:col-span-1 ${isEditable ? "hidden" : ""}`}>
-                                                    <label className="pl-5 pb-1 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-full">Hasło</label>
-                                                    <input
-                                                        type="password"
-                                                        name="password"
-                                                        minLength={8}
-                                                        maxLength={128}
-                                                        placeholder="Hasło"
-                                                        className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-full"
-                                                        value={password}
-                                                        onChange={(e) => { setError(null); setPassword(e.target.value) }}
-                                                        onKeyDown={(e) => {
-                                                            if (e.key === "Enter")
-                                                                document.getElementsByName("confirmPassword")[0].focus();
-                                                        }}                                                    />
-                                                </div>
+                                        <div className={`col-span-2 pt-5 md:col-span-1 ${isEditable ? "hidden" : ""}`}>
+                                            <label className="pl-5 pb-1 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-full">Potwierdź</label>
+                                            <input
+                                                type="password"
+                                                name="confirmPassword"
+                                                minLength={8}
+                                                maxLength={128}
+                                                placeholder="Potwierdź hasło"
+                                                className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-full"
+                                                value={confirmPassword}
+                                                onChange={(e) => { setError(null); setConfirmPassword(e.target.value) }}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === "Enter") handleUpdate();
+                                                }} />
+                                        </div>
 
-                                                <div className={`col-span-2 pt-5 md:col-span-1 ${isEditable ? "hidden" : ""}`}>
-                                                    <label className="pl-5 pb-1 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-full">Potwierdź</label>
-                                                    <input
-                                                        type="password"
-                                                        name="confirmPassword"
-                                                        minLength={8}
-                                                        maxLength={128}
-                                                        placeholder="Potwierdź hasło"
-                                                        className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-full"
-                                                        value={confirmPassword}
-                                                        onChange={(e) => { setError(null); setConfirmPassword(e.target.value) }}
-                                                        onKeyDown={(e) => {
-                                                            if (e.key === "Enter") handleUpdate();
-                                                        }}                                                    />
-                                                </div>
+                                        <div className="col-span-2 pt-3 mb-5 md:mb-10 items-center justify-center text-center pt-5">
+                                            <p className="text-[#FF2400]">{error}</p>
+                                            <p className="text-[#3CB043]">{success}</p>
+                                        </div>
 
-                                                <div className="col-span-2 pt-3 mb-5 md:mb-10 items-center justify-center text-center pt-5">
-                                                    <p className="text-[#FF2400]">{error}</p>
-                                                    <p className="text-[#3CB043]">{success}</p>
-                                                </div>
+                                        <div className="col-span-1 flex items-center justify-center">
+                                            <button
+                                                type="button"
+                                                className="flex rounded-full items-center justify-center text-white h-12 bg-[#2775EE]  hover:bg-[#0F52BA] md:text-base lg:text-lg shadow-[0px_9px_30px_rgba(0,0,0,0.3)] w-3/4"
+                                                onClick={handleUpdate}
+                                                disabled={isDisabled}
+                                            >
+                                                {button}
+                                            </button>
+                                        </div>
 
-                                                <div className="col-span-1 flex items-center justify-center">
-                                                    <button
-                                                        type="button"
-                                                        className="flex rounded-full items-center justify-center text-white h-12 bg-[#2775EE]  hover:bg-[#0F52BA] md:text-base lg:text-lg shadow-[0px_9px_30px_rgba(0,0,0,0.3)] w-3/4"
-                                                        onClick={handleUpdate}
-                                                        disabled={isDisabled}
-                                                    >
-                                                        { button }
-                                                    </button>
-                                                </div>
+                                        <div className="flex flex-col col-span-1 flex items-center justify-center">
+                                            <label className="pl-2 text-xs md:text-base pb-1 font-bold">Edycja danych</label>
+                                            <input
+                                                type="checkbox"
+                                                className="w-5 h-5 rounded-full accent-[#2775EE]"
+                                                id="editorialCheckboxs"
+                                                onChange={handleEditorial}
+                                                checked={isChecked} />
+                                        </div>
 
-                                                <div className="flex flex-col col-span-1 flex items-center justify-center">
-                                                    <label className="pl-2 text-xs md:text-base pb-1 font-bold">Edycja danych</label>
-                                                    <input
-                                                        type="checkbox"
-                                                        className="w-5 h-5 rounded-full accent-[#2775EE]"
-                                                        id="editorialCheckboxs"
-                                                        onChange={handleEditorial}
-                                                        checked={isChecked} />
-                                                </div>
-
-                                                <div className="col-span-2 flex items-center justify-center">
-                                                    <button
-                                                        type="button"
-                                                        className="flex rounded-full mt-5 md:mt-10 items-center justify-center text-white h-12 bg-[#D0312D] text-white hover:bg-[#B90E0A] md:text-base lg:text-lg shadow-[0px_9px_30px_rgba(0,0,0,0.3)] w-1/2 md: 1/4"
-                                                        onClick={handleDelete}
-                                                    >
-                                                        <Trash2 className="w-5 h-5 lg:mr-2"/><p className="hidden lg:block">Usuń konto</p>
-                                                    </button>
-                                                </div>
-                                            </form></>
-                                )}
+                                        <div className="col-span-2 flex items-center justify-center">
+                                            <button
+                                                type="button"
+                                                className="flex rounded-full mt-5 md:mt-10 items-center justify-center text-white h-12 bg-[#D0312D] text-white hover:bg-[#B90E0A] md:text-base lg:text-lg shadow-[0px_9px_30px_rgba(0,0,0,0.3)] w-1/2 md: 1/4"
+                                                onClick={handleDelete}
+                                            >
+                                                <Trash2 className="w-5 h-5 lg:mr-2" /><p className="hidden lg:block">Usuń konto</p>
+                                            </button>
+                                        </div>
+                                    </form></>
+                            )}
                         </div>
                     </div>
                 </div>

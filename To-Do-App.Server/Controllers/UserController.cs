@@ -9,15 +9,19 @@ namespace To_Do_App.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    // Kontroler do obsługi użytkowników
     public class UserController : ControllerBase
     {
+        // Usługi
         private readonly IUserService _userService;
 
+        // Konstruktor
         public UserController(IUserService userService)
         {
             _userService = userService;
         }
 
+        // Metoda do uzyskiwania wszystkich użytkowników z mapowaniem i metodą HTTP
         [HttpGet(Name = "GetAllUsers")]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
@@ -36,6 +40,7 @@ namespace To_Do_App.Server.Controllers
             }
         }
 
+        // Metoda do uzyskiwania użytkownika po ID z mapowaniem i metodą HTTP
         [HttpGet("{userId}", Name = "GetUserById")]
         public async Task<ActionResult<User>> GetUser(Guid userId)
         {
@@ -54,6 +59,7 @@ namespace To_Do_App.Server.Controllers
             }
         }
 
+        // Metoda do dodawania użytkownika z mapowaniem i metodą HTTP
         [HttpPost(Name = "AddUser")]
         public async Task<ActionResult<User>> AddUser([FromBody] User user)
         {
@@ -73,6 +79,7 @@ namespace To_Do_App.Server.Controllers
             }
         }
 
+        // Metoda do aktualizacji użytkownika z mapowaniem i metodą HTTP
         [HttpPatch("{userId}", Name = "UpdateUser")]
         public async Task<IActionResult> UpdateUser(Guid userId, [FromBody] JsonPatchDocument<User> patchDoc)
         {
@@ -97,6 +104,7 @@ namespace To_Do_App.Server.Controllers
             }
         }
 
+        // Metoda do usuwania użytkownika z mapowaniem i metodą HTTP
         [HttpDelete("{userId}", Name = "DeleteUser")]
         public async Task<IActionResult> DeleteUser(Guid userId)
         {
@@ -109,78 +117,6 @@ namespace To_Do_App.Server.Controllers
             {
                 await _userService.DeleteUser(userId);
                 return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Wystąpił błąd serwera: {ex.Message}");
-            }
-        }
-
-        [HttpGet("username/{username}", Name = "GetUserByUsername")]
-        public async Task<ActionResult<User>> GetUserByUsername(String username)
-        {
-            try
-            {
-                var user = await _userService.GetUserByUsername(username);
-                if (user == null)
-                {
-                    return NotFound("Nie znaleziono użytkownika o podanej nazwie!");
-                }
-                return Ok(user);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Wystąpił błąd serwera: {ex.Message}");
-            }
-        }
-
-        [HttpGet("email/{email}", Name = "GetUserByEmail")]
-        public async Task<ActionResult<User>> GetUserByEmail(String email)
-        {
-            try
-            {
-                var user = await _userService.GetUserByEmail(email);
-                if (user == null)
-                {
-                    return NotFound("Nie znaleziono użytkownika o podanym adresie e-mail!");
-                }
-                return Ok(user);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Wystąpił błąd serwera: {ex.Message}");
-            }
-        }
-
-        [HttpGet("user-pass/{username}/{password}", Name = "GetUserByUsernameAndPassword")]
-        public async Task<ActionResult<User>> GetUserByUsernameAndPassword(String username, String password)
-        {
-            try
-            {
-                var user = await _userService.GetUserByUsernameAndPassword(username, password);
-                if (user == null)
-                {
-                    return NotFound("Nie znaleziono użytkownika o podanej nazwie i haśle!");
-                }
-                return Ok(user);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Wystąpił błąd serwera: {ex.Message}");
-            }
-        }
-
-        [HttpGet("email-pass/{email}/{password}", Name = "GetUserByEmailAndPassword")]
-        public async Task<ActionResult<User>> GetUserByEmailAndPassword(String email, String password)
-        {
-            try
-            {
-                var user = await _userService.GetUserByEmailAndPassword(email, password);
-                if (user == null)
-                {
-                    return NotFound("Nie znaleziono użytkownika o podanym adresie e-mail i haśle!");
-                }
-                return Ok(user);
             }
             catch (Exception ex)
             {

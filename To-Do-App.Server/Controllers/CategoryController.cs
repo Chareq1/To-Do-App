@@ -9,15 +9,19 @@ namespace To_Do_App.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    // Kontroler do obsługi kategorii
     public class CategoryController : ControllerBase
     {
+        // Usługi
         private readonly ICategoryService _categoryService;
 
+        // Konstruktor
         public CategoryController(ICategoryService categoryService)
         {
             _categoryService = categoryService;
         }
 
+        // Metoda do uzyskiwania wszystkich kategorii użytkownika z mapowaniem i metodą HTTP
         [HttpGet("user/{userId}", Name = "GetAllUserCategories")]
         public async Task<ActionResult<IEnumerable<Category>>> GetCategories(Guid userId)
         {
@@ -32,6 +36,7 @@ namespace To_Do_App.Server.Controllers
             }
         }
 
+        // Metoda do uzyskiwania kategorii po ID z mapowaniem i metodą HTTP
         [HttpGet("{categoryId}", Name = "GetCategoryById")]
         public async Task<ActionResult<Category>> GetCategory(Guid categoryId)
         {
@@ -50,6 +55,7 @@ namespace To_Do_App.Server.Controllers
             }
         }
 
+        // Metoda do dodawania kategorii z mapowaniem i metodą HTTP
         [HttpPost(Name = "AddCategory")]
         public async Task<ActionResult<Category>> AddCategory([FromBody] Category category)
         {
@@ -69,6 +75,7 @@ namespace To_Do_App.Server.Controllers
             }
         }
 
+        // Metoda do aktualizacji kategorii z mapowaniem i metodą HTTP
         [HttpPatch("{categoryId}", Name = "UpdateCategory")]
         public async Task<IActionResult> UpdateCategory(Guid categoryId, [FromBody] JsonPatchDocument<Category> patchDoc)
         {
@@ -93,6 +100,7 @@ namespace To_Do_App.Server.Controllers
             }
         }
 
+        // Metoda do usuwania kategorii z mapowaniem i metodą HTTP
         [HttpDelete("{categoryId}", Name = "DeleteCategory")]
         public async Task<IActionResult> DeleteCategory(Guid categoryId)
         {
@@ -111,24 +119,5 @@ namespace To_Do_App.Server.Controllers
                 throw new Exception($"Wystąpił błąd podczas usuwania kategorii: {ex.Message}");
             }
         }
-
-        [HttpGet("name/{name}", Name = "GetCategoryByName")]
-        public async Task<ActionResult<Category>> GetCategoryByName(Guid userId, string name)
-        {
-            try
-            {
-                var category = await _categoryService.GetCategoriesByName(userId, name);
-                if (category == null)
-                {
-                    return NotFound("Nie znaleziono kategorii o podanej nazwie!");
-                }
-                return Ok(category);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Wystąpił błąd serwera: {ex.Message}");
-            }
-        }
-
     }
 }

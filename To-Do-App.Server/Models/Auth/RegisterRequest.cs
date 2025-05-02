@@ -1,5 +1,6 @@
 ﻿namespace To_Do_App.Server.Models.Auth
 {
+    // Klasa do obsługi żądania rejestracji
     public class RegisterRequest
     {
         public string Username { get; set; } = default!;

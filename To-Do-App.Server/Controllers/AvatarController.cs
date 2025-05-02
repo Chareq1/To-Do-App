@@ -11,17 +11,21 @@ namespace To_Do_App.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    // Kontroler do obsługi avatarów
     public class AvatarController : ControllerBase
     {
+        // Usługi
         private readonly IAvatarService _avatarService;
         private readonly IUserService _userService;
 
+        // Konstruktor
         public AvatarController(IAvatarService avatarService, IUserService userService)
         {
             _avatarService = avatarService;
             _userService = userService;
         }
 
+        // Metoda do uzyskiwania wszystkich avatarów z mapowaniem i metodą HTTP
         [HttpGet(Name = "GetAllAvatars")]
         public async Task<ActionResult<IEnumerable<Avatar>>> GetAvatars()
         {
@@ -40,6 +44,7 @@ namespace To_Do_App.Server.Controllers
             }
         }
 
+        // Metoda do uzyskiwania avatara po ID z mapowaniem i metodą HTTP
         [HttpGet("{avatarId}", Name = "GetAvatarById")]
         public async Task<ActionResult<Avatar>> GetAvatar(Guid avatarId)
         {
@@ -58,6 +63,7 @@ namespace To_Do_App.Server.Controllers
             }
         }
 
+        // Metoda do dodawania avatara z mapowaniem i metodą HTTP
         [HttpPost(Name = "AddAvatar")]
         public async Task<ActionResult<Avatar>> AddAvatar([FromForm] FileUploadRequest file, [FromQuery] Guid userId)
         {
@@ -108,6 +114,7 @@ namespace To_Do_App.Server.Controllers
 
         }
 
+        // Metoda do aktualizacji avatara z mapowaniem i metodą HTTP
         [HttpPatch("{avatarId}", Name = "UpdateAvatar")]
         public async Task<IActionResult> UpdateAvatar(Guid avatarId, [FromBody] JsonPatchDocument<Avatar> patchDoc)
         {
@@ -132,6 +139,7 @@ namespace To_Do_App.Server.Controllers
             }
         }
 
+        // Metoda do usuwania z mapowaniem i metodą HTTP
         [HttpDelete("{avatarId}", Name = "DeleteAvatar")]
         public async Task<IActionResult> DeleteAvatar(Guid avatarId)
         {
@@ -151,6 +159,7 @@ namespace To_Do_App.Server.Controllers
             }
         }
 
+        // Metoda do uzyskiwania domyślnego avatara z mapowaniem i metodą HTTP
         [HttpGet("default", Name = "GetDefaultAvatar")]
         public async Task<ActionResult<Avatar>> GetDefaultAvatar()
         {

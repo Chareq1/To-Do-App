@@ -1,38 +1,39 @@
-﻿"Sukces to suma niewielkich wysiłków powtarzanych dzień po dniu."–Robert Collier
-"Sukces to nie klucz do szczęścia. To szczęście jest kluczem do sukcesu. Jeśli kochasz to, co robisz, osiągniesz sukces." - Albert Schweitzer
-"Największą chwałą nie jest to, że nigdy nie upadamy, ale że potrafimy się podnieść po każdym upadku." - Konfucjusz
-"Lepiej ponieść porażkę w oryginalności niż odnieść sukces w imitacji." - Herman Melville
-"Cierpliwość, wytrwałość i pot w końcu prowadzą do sukcesu." - Napoleon Hill
-"Jeśli nie wiesz, dokąd zmierzasz, każda droga cię tam zaprowadzi." - Lewis Carroll
-"Dobrze zaplanowane jest w połowie wykonane." - Arystoteles"Plan to nic, planowanie jest wszystkim." - Dwight D. Eisenhower
-"Człowiek bez planu na życie jest jak statek bez steru - dryfuje bez celu." - Thomas Carlyle
-"Nie planuj sukcesu. Planuj rozwój - sukces przyjdzie sam." - Terry Orlick
-"Wizja bez działania to marzenie. Działanie bez wizji to koszmar." - japońskie przysłowie
-"Zrób dzisiaj coś, za co twoje przyszłe ja ci podziękuje." - autor nieznany
-"Nie odkładaj na jutro tego, co możesz zrobić dzisiaj." - Benjamin Franklin
-"Wielkość nie polega na tym, co zamierzasz, ale na tym, co robisz." - Robin Sharma
-"Rób to, co trzeba, kiedy trzeba, bez względu na to, czy ci się chce." - autor nieznany 
-"Sukces wymaga trzech rzeczy: planu, działania i wytrwałości." - autor nieznany
-"Nie musisz być wielki, by zacząć, ale musisz zacząć, by być wielki." - Zig Ziglar
-"Ludzie nie planują porażki, po prostu nie planują sukcesu." - William A. Ward
-"Od pomysłu do realizacji prowadzi jedna droga - działanie." - autor nieznany
-"Wielkie rzeczy nigdy nie pochodzą ze strefy komfortu." - autor nieznany
-"Nie sukces sprawia, że jesteś szczęśliwy. To szczęście prowadzi do sukcesu." - Shawn Achor
-"Sukces to przechodzenie od porażki do porażki bez utraty entuzjazmu." - Winston Churchill
-"Nie czekaj na idealny moment. Weź chwilę i spraw, by była idealna." - autor nieznany
-"Największym sukcesem jest być sobą w świecie, który stale próbuje uczynić cię kimś innym." - Ralph Waldo Emerson
-"Sekret sukcesu tkwi w robieniu zwykłych rzeczy w niezwykły sposób." - John D. Rockefeller Jr.
-"Jeśli nie planujesz, planujesz porażkę." - Benjamin Franklin
-"Cel bez planu to tylko życzenie." - Antoine de Saint-Exupéry
-"Dobrze zaplanowane działanie to już połowa sukcesu." - Miguel de Cervantes
-"Zawsze planuj tak, jakby nic nie mogło się nie udać. I przygotuj się, jakby wszystko mogło się zepsuć." - Benjamin Disraeli
-"Nie musisz być wielki, by zacząć, ale musisz zacząć, by być wielki." - Zig Ziglar
-"Dyscyplina jest pomostem między celami a ich realizacją." - Jim Rohn
-"Lepiej zrobić coś niedoskonale niż nic nie zrobić perfekcyjnie." - Karen Lamb
-"Działanie jest kluczem do każdego sukcesu." - Pablo Picasso
-"Nie odkładaj na jutro tego, co możesz zrobić dzisiaj." - Thomas Jefferson
-"Wizja bez działania to marzenie. Działanie bez wizji to koszmar." - japońskie przysłowie
-"Najlepszy czas na zasadzenie drzewa był 20 lat temu. Drugi najlepszy czas jest teraz." - przysłowie chińskie
-"Nie licz dni, spraw, aby dni się liczyły." - Muhammad Ali
-"Wielkie rzeczy nie powstają z komfortu." - Neale Donald Walsch
-"Sukces to 1% inspiracji i 99% potu." - Thomas Edison
+﻿"Sukces to suma niewielkich wysiłków powtarzanych dzień po dniu." / Robert Collier
+"Sukces to nie klucz do szczęścia. To szczęście jest kluczem do sukcesu. Jeśli kochasz to, co robisz, osiągniesz sukces." / Albert Schweitzer
+"Największą chwałą nie jest to, że nigdy nie upadamy, ale że potrafimy się podnieść po każdym upadku." / Konfucjusz
+"Lepiej ponieść porażkę w oryginalności niż odnieść sukces w imitacji." / Herman Melville
+"Cierpliwość, wytrwałość i pot w końcu prowadzą do sukcesu." / Napoleon Hill
+"Jeśli nie wiesz, dokąd zmierzasz, każda droga cię tam zaprowadzi." / Lewis Carroll
+"Dobrze zaplanowane jest w połowie wykonane." / Arystoteles
+"Plan to nic, planowanie jest wszystkim." / Dwight D. Eisenhower
+"Człowiek bez planu na życie jest jak statek bez steru - dryfuje bez celu." / Thomas Carlyle
+"Nie planuj sukcesu. Planuj rozwój, a sukces przyjdzie sam." / Terry Orlick
+"Wizja bez działania to marzenie. Działanie bez wizji to koszmar." / japońskie przysłowie
+"Zrób dzisiaj coś, za co twoje przyszłe ja ci podziękuje." / autor nieznany
+"Nie odkładaj na jutro tego, co możesz zrobić dzisiaj." / Benjamin Franklin
+"Wielkość nie polega na tym, co zamierzasz, ale na tym, co robisz." / Robin Sharma
+"Rób to, co trzeba, kiedy trzeba, bez względu na to, czy ci się chce." / autor nieznany 
+"Sukces wymaga trzech rzeczy: planu, działania i wytrwałości." / autor nieznany
+"Nie musisz być wielki, by zacząć, ale musisz zacząć, by być wielki." / Zig Ziglar
+"Ludzie nie planują porażki, po prostu nie planują sukcesu." / William A. Ward
+"Od pomysłu do realizacji prowadzi jedna droga, czyli działanie." / autor nieznany
+"Wielkie rzeczy nigdy nie pochodzą ze strefy komfortu." / autor nieznany
+"Nie sukces sprawia, że jesteś szczęśliwy. To szczęście prowadzi do sukcesu." / Shawn Achor
+"Sukces to przechodzenie od porażki do porażki bez utraty entuzjazmu." / Winston Churchill
+"Nie czekaj na idealny moment. Weź chwilę i spraw, by była idealna." / autor nieznany
+"Największym sukcesem jest być sobą w świecie, który stale próbuje uczynić cię kimś innym." / Ralph Waldo Emerson
+"Sekret sukcesu tkwi w robieniu zwykłych rzeczy w niezwykły sposób." / John D. Rockefeller Jr.
+"Jeśli nie planujesz, planujesz porażkę." / Benjamin Franklin
+"Cel bez planu to tylko życzenie." / Antoine de Saint-Exupéry
+"Dobrze zaplanowane działanie to już połowa sukcesu." / Miguel de Cervantes
+"Zawsze planuj tak, jakby nic nie mogło się nie udać. I przygotuj się, jakby wszystko mogło się zepsuć." / Benjamin Disraeli
+"Nie musisz być wielki, by zacząć, ale musisz zacząć, by być wielki." / Zig Ziglar
+"Dyscyplina jest pomostem między celami a ich realizacją." / Jim Rohn
+"Lepiej zrobić coś niedoskonale niż nic nie zrobić perfekcyjnie." / Karen Lamb
+"Działanie jest kluczem do każdego sukcesu." / Pablo Picasso
+"Nie odkładaj na jutro tego, co możesz zrobić dzisiaj." / Thomas Jefferson
+"Wizja bez działania to marzenie. Działanie bez wizji to koszmar." / japońskie przysłowie
+"Najlepszy czas na zasadzenie drzewa był 20 lat temu. Drugi najlepszy czas jest teraz." / przysłowie chińskie
+"Nie licz dni, spraw, aby dni się liczyły." / Muhammad Ali
+"Wielkie rzeczy nie powstają z komfortu." / Neale Donald Walsch
+"Sukces to 1% inspiracji i 99% potu." / Thomas Edison

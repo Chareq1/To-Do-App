@@ -3,13 +3,16 @@ import { useLocation, NavLink, useNavigate } from "react-router-dom";
 import { Layers, Home as HomeIcon, Calendar, ChevronFirst, ChevronLast, LogOut } from "lucide-react";
 import { useUser } from "../context/UserContext";
 
+// Interfejs do reprezentacji avatara
 interface Avatar {
     avatarId: string;
     fileName: string;
     filePath: string;
 }
 
+// Komponent nawigacji
 const Navigation = () => {
+    // Wszystkie potrzebne hooki i stany
     const location = useLocation();
     const pathname = location.pathname;
     const [expanded, setExpanded] = useState(false);
@@ -18,6 +21,7 @@ const Navigation = () => {
 
     const navigate = useNavigate();
 
+    // Efekt do ładowania avatara
     useEffect(() => {
         const fetchAvatar = async () => {
             const response = await fetch(`/api/Avatar/${user?.avatarId}`);
@@ -30,6 +34,7 @@ const Navigation = () => {
         fetchAvatar();
     }, [user?.avatarId]);
 
+    // Funkcja do obsługi wylogowania
     function handleLogout() {
         logout();
         navigate("/login");
@@ -39,7 +44,7 @@ const Navigation = () => {
         <div
             className={`h-full ${expanded ? "w-64" : "w-20"} flex flex-col shadow-lg rounded-xl bg-[#0F52BA] transition-all duration-300 relative`}
         >
-            {/* Expand/Collapse Button */}
+            {/* Przycisk do zwijania/rozwijania */}
             <div className="flex-none flex items-center justify-center py-4 sm:flex hidden">
                 <button
                     onClick={() => setExpanded((prev) => !prev)}
@@ -49,7 +54,7 @@ const Navigation = () => {
                 </button>
             </div>
 
-            {/* Navigation Items */}
+            {/* Elementy nawigacji */}
             <ul className="flex flex-col gap-y-2 text-white px-2 mt-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 h-full">
                 <NavLink
                     to="/home"
@@ -100,6 +105,7 @@ const Navigation = () => {
                 </NavLink>
             </ul>
 
+            { /* Avatar, nazwa użytkownika i przycisk do wylogowywania */}
             <div className="absolute left-0 bottom-0 w-full">
                 <div className={`p-4 flex items-center justify-between ${expanded ? "flex-row" : "flex-col"}`}>
                     <div className="flex items-center">

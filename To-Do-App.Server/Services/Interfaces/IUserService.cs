@@ -3,6 +3,7 @@ using To_Do_App.Server.Models;
 
 namespace To_Do_App.Server.Services.Interfaces
 {
+    // Interfejs usługi dla użytkowników
     public interface IUserService
     {
         public Task<IEnumerable<User>> GetUsers();
@@ -12,8 +13,6 @@ namespace To_Do_App.Server.Services.Interfaces
         public System.Threading.Tasks.Task DeleteUser(Guid userId);
         public Task<User?> GetUserByUsername(string username);
         public Task<User?> GetUserByEmail(string email);
-        public Task<User?> GetUserByUsernameAndPassword(string username, string password);
-        public Task<User?> GetUserByEmailAndPassword(string email, string password);
         public bool VerifyPassword(String hash, String password);
     }
 }

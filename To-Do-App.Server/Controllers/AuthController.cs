@@ -10,17 +10,21 @@ namespace To_Do_App.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    // Kontroler do obsługi autoryzacji
     public class AuthController : ControllerBase
     {
+        // Usługi
         private readonly IUserService _userService;
         private readonly IAvatarService _avatarService;
 
+        // Konstruktor
         public AuthController(IUserService userService, IAvatarService avatarService)
         {
             _userService = userService;
             _avatarService = avatarService;
         }
 
+        // Metoda do obsługi rejestracji użytkownika z mapowaniem i metodą HTTP
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterRequest req)
         {
@@ -43,6 +47,7 @@ namespace To_Do_App.Server.Controllers
             return Ok(new { Message = "Rejestracja zakończona sukcesem!" });
         }
 
+        // Metoda do obsługi logowania użytkownika z mapowaniem i metodą HTTP
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginRequest req)
         {
@@ -63,6 +68,7 @@ namespace To_Do_App.Server.Controllers
             return Ok(new { Message = "Logowanie zakończone sukcesem!" });
         }
 
+        // Metoda do obsługi wylogowania użytkownika z mapowaniem i metodą HTTP
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
@@ -71,6 +77,7 @@ namespace To_Do_App.Server.Controllers
             return Ok(new { Message = "Wylogowanie zakończone sukcesem!" });
         }
 
+        // Metoda do uwierzytelniania użytkownika na bazie otrzymanego cookie z mapowaniem i metodą HTTP
         [HttpGet("me")]
         public async Task<IActionResult> Me()
         {

@@ -4,8 +4,9 @@ import { Notebook, KeySquare } from "lucide-react";
 import LoadingScreen from "../components/LoadingScreen";
 import { useUser } from "../context/UserContext";
 
+// Strona rejestracji
 const Register = () => {
-    //POLA
+    // Wszystkie potrzebne hooki i stany
     const { loading, user, initialLoading } = useUser();
     const [username, setUsername] = useState("");
     const [name, setName] = useState("");
@@ -20,7 +21,7 @@ const Register = () => {
 
     const navigate = useNavigate();
 
-    //Sprawdzenie, czy jakiś użytkownik jest zalogowany
+    // Efekt do ustawienia tła strony i przekierowania użytkownika
     useEffect(() => {
         document.body.classList.add("bg-[#212121]");
         document.body.classList.replace("bg-[#ffffff]", "bg-[#212121]");
@@ -34,45 +35,47 @@ const Register = () => {
         }
     }, [loading, user]);
 
+    // Sprawdzenie, czy użytkownik jest już zalogowany
     if (loading || initialLoading || authLoading) {
         return <LoadingScreen />;
     }
 
+    // Sprawdzenie, czy użytkownik jest już zalogowany
     if (user) {
         return <Navigate to="/" />;
     }
 
-    //Metoda do walidacji nazwy użytkownika
+    //Funkcja do walidacji nazwy użytkownika
     const validateUsername = (username: string) => {
         const usernameRegex = /^[a-zA-Z0-9_\-\.ęąóśżźćłĘĄÓŚŻŹĆŁ]{3,40}$/;
         return usernameRegex.test(username);
     };
 
-    //Metoda do walidacji adresu e-mail
+    //Funkcja do walidacji adresu e-mail
     const validateEmail = (email: string) => {
         const emailRegex = /^((?!\.)[\w-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/;
         return emailRegex.test(email);
     };
 
-    //Metoda do walidacji hasła
+    //Funkcja do walidacji hasła
     const validatePassword = (password: string) => {
         const passwordRegex = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,128}$/;
         return passwordRegex.test(password);
     };
 
-    //Metoda do walidacji imienia
+    //Funkcja do walidacji imienia
     const validateName = (name: string) => {
         const nameRegex = /^[A-Za-zęąóśżźćłĘĄÓŚŻŹĆŁ]+(?:[-' ][A-Za-zęąóśżźćłĘĄÓŚŻŹĆŁ]+)*$/;
         return nameRegex.test(name);
     };
 
-    //Metoda do walidacji nazwiska
+    //Funkcja do walidacji nazwiska
     const validateSurname = (surname: string) => {
         const surnameRegex = /^[A-Za-zęąóśżźćłĘĄÓŚŻŹĆŁ]+(?:[-' ][A-Za-zęąóśżźćłĘĄÓŚŻŹĆŁ]+)*$/;
         return surnameRegex.test(surname);
     };
 
-    //Metoda do obsługi rejestracji użytkownika
+    //Funkcja do obsługi rejestracji użytkownika
     const handleRegister = async () => {
         try {
             setError(null);
@@ -140,14 +143,12 @@ const Register = () => {
                 return;
             }
 
-            // Rejestracja użytkownika
             const response = await fetch("/api/auth/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, name, surname, email, password })
             });
 
-            // Sprawdzanie, czy wystąpił błąd
             if (!response.ok) {
                 const data = await response.json();
                 setError(<>{data.message}</>);
@@ -169,7 +170,7 @@ const Register = () => {
 
     return (
         <div className="w-full flex items-center justify-center md:flex-row flex-col m-0 min-h-screen font-[Ubuntu]">
-            { /* Lewa sekcja z obrazem*/ }
+            { /* Lewa sekcja z obrazem*/}
             <div className="w-full h-full md:h-screen rounded-xl items-center justify-center p-5 relative sm:flex-1 lg:flex-2 overflow-hidden">
                 <img src="/Resources/login1.jpg" className="rounded-xl object-cover h-full w-full" />
 
@@ -183,7 +184,7 @@ const Register = () => {
                 </div>
             </div>
 
-            { /* Prawa sekcja z formularzem */ }
+            { /* Prawa sekcja z formularzem rejestracji */}
             <div className="w-full bg-[#212121] rounded-2xl flex flex-col p-5 items-center flex-1 text-left overflow-y-auto max-h-screen">
                 <div className="flex flex-col items-center justify-center w-3/4 h-full py-10">
                     <label className="text-4xl text-[#e8e8e8] font-bold text-left w-full pb-10  pl-5">Zarejestruj się</label>
@@ -202,7 +203,7 @@ const Register = () => {
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter")
                                         document.getElementsByName("email")[0].focus();
-                                }}    
+                                }}
                             />
                         </div>
 
@@ -219,7 +220,7 @@ const Register = () => {
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter")
                                         document.getElementsByName("name")[0].focus();
-                                }}    
+                                }}
                             />
                         </div>
 
@@ -236,7 +237,7 @@ const Register = () => {
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter")
                                         document.getElementsByName("surname")[0].focus();
-                                }}    
+                                }}
                             />
                         </div>
 
@@ -253,7 +254,7 @@ const Register = () => {
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter")
                                         document.getElementsByName("password")[0].focus();
-                                }}    
+                                }}
                             />
                         </div>
 
@@ -271,7 +272,7 @@ const Register = () => {
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter")
                                         document.getElementsByName("confirmPassword")[0].focus();
-                                }}    
+                                }}
                             />
                         </div>
 
@@ -288,7 +289,7 @@ const Register = () => {
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter") handleRegister();
-                                }}            
+                                }}
                             />
                         </div>
 

@@ -7,25 +7,31 @@ using System.Threading.Tasks;
 
 namespace To_Do_App.Server.Services
 {
+    // Klasa usługi dla zadań
     public class TaskService : ITaskService
     {
+        // Deklaracja kontekstu bazy danych
         private readonly ApplicationDbContext _context;
 
+        // Konstruktor
         public TaskService(ApplicationDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
+        // Metoda do pobierania wszystkich zadań dla danego użytkownika
         public async Task<IEnumerable<Models.Task>> GetTasks(Guid userId)
         {
             return await _context.Tasks.Where(t => t.UserId == userId).ToListAsync();
         }
 
+        // Metoda do pobierania zadania po identyfikatorze
         public async Task<Models.Task> GetTask(Guid taskId)
         {
             return await _context.Tasks.FirstOrDefaultAsync(t => t.TaskId == taskId);
         }
 
+        // Metoda do dodawania nowego zadania
         public async Task<Models.Task> AddTask(Models.Task task)
         {
             if (task == null) 
@@ -58,6 +64,7 @@ namespace To_Do_App.Server.Services
             }
         }
 
+        // Metoda do aktualizacji zadania
         public async System.Threading.Tasks.Task UpdateTask(Guid taskId, JsonPatchDocument<Models.Task> patchDoc)
         {
             if (patchDoc == null)
@@ -95,6 +102,7 @@ namespace To_Do_App.Server.Services
             }
         }
 
+        // Metoda do usuwania zadania
         public async System.Threading.Tasks.Task DeleteTask(Guid taskId)
         {
             try
@@ -111,42 +119,6 @@ namespace To_Do_App.Server.Services
             {
                 throw new DbUpdateException("Nie można usunąć zadania z bazy danych!", ex);
             }
-        }
-
-        // GET
-        public async Task<IEnumerable<Models.Task>> GetTasksByCategory(Guid userId, Guid categoryId)
-        {
-            return await _context.Tasks.Where(t => t.UserId == userId && t.CategoryId == categoryId).ToListAsync();
-        }
-
-        public async Task<IEnumerable<Models.Task>> GetTasksByPriority(Guid userId, int priority)
-        {
-            return await _context.Tasks.Where(t => t.UserId == userId && (int)t.Priority == priority).ToListAsync();
-        }
-
-        public async Task<IEnumerable<Models.Task>> GetTasksByStatus(Guid userId, int status)
-        {
-            return await _context.Tasks.Where(t => t.UserId == userId && (int)t.Status == status).ToListAsync();
-        }
-
-        public async Task<IEnumerable<Models.Task>> GetTasksByDueDate(Guid userId, DateTime dueDate)
-        {
-            return await _context.Tasks.Where(t => t.UserId == userId && t.DueDate == dueDate).ToListAsync();
-        }
-
-        public async Task<IEnumerable<Models.Task>> GetTasksByDueDateRange(Guid userId, DateTime startDate, DateTime endDate)
-        {
-            return await _context.Tasks.Where(t => t.UserId == userId && t.DueDate >= startDate && t.DueDate <= endDate).ToListAsync();
-        }
-
-        public async Task<IEnumerable<Models.Task>> GetTasksByName(Guid userId, string name)
-        {
-            return await _context.Tasks.Where(t => t.UserId == userId && t.Name == name).ToListAsync();
-        }
-
-        public async Task<IEnumerable<Models.Task>> GetTasksByCreatedDate(Guid userId, DateTime createdDate)
-        {
-            return await _context.Tasks.Where(t => t.UserId == userId && t.CreatedAt == createdDate).ToListAsync();
         }
     }
 }

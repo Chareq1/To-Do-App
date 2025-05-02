@@ -9,15 +9,19 @@ namespace To_Do_App.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    // Kontroler do obsługi zadań
     public class TaskController : ControllerBase
     {
+        // Usługi
         public readonly ITaskService _taskService;
 
+        // Konstruktor
         public TaskController(ITaskService taskService)
         {
             _taskService = taskService;
         }
 
+        // Metoda do uzyskiwania zadań użytkownika z mapowaniem i metodą HTTP
         [HttpGet("user/{userId}", Name = "GetAllUserTasks")]
         public async Task<ActionResult<IEnumerable<Models.Task>>> GetTasks(Guid userId)
         {
@@ -32,6 +36,7 @@ namespace To_Do_App.Server.Controllers
             }
         }
 
+        // Metoda do uzyskiwania zadania po ID z mapowaniem i metodą HTTP
         [HttpGet("{taskId}", Name = "GetTaskById")]
         public async Task<ActionResult<Models.Task>> GetTask(Guid taskId)
         {
@@ -50,6 +55,7 @@ namespace To_Do_App.Server.Controllers
             }
         }
 
+        // Metoda do dodawania zadania z mapowaniem i metodą HTTP
         [HttpPost(Name = "AddTask")]
         public async Task<ActionResult<Models.Task>> AddTask([FromBody] Models.Task task)
         {
@@ -69,6 +75,7 @@ namespace To_Do_App.Server.Controllers
             }
         }
 
+        // Metoda do aktualizacji zadania z mapowaniem i metodą HTTP
         [HttpPatch("{taskId}", Name = "UpdateTask")]
         public async Task<IActionResult> UpdateTask(Guid taskId, [FromBody] JsonPatchDocument<Models.Task> patchDoc)
         {
@@ -93,6 +100,7 @@ namespace To_Do_App.Server.Controllers
             }
         }
 
+        // Metoda do usuwania zadania z mapowaniem i metodą HTTP
         [HttpDelete("{taskId}", Name = "DeleteTask")]
         public async Task<IActionResult> DeleteTask(Guid taskId)
         {
@@ -105,134 +113,6 @@ namespace To_Do_App.Server.Controllers
             {
                 await _taskService.DeleteTask(taskId);
                 return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Wystąpił błąd serwera: {ex.Message}");
-            }
-        }
-
-
-        // GET
-        [HttpGet("category/{userId}/{categoryId}", Name = "GetTasksByCategory")]
-        public async Task<ActionResult<IEnumerable<Models.Task>>> GetTasksByCategory(Guid userId, Guid categoryId)
-        {
-            try
-            {
-                var tasks = await _taskService.GetTasksByCategory(userId, categoryId);
-                if (tasks == null || !tasks.Any())
-                {
-                    return NotFound("Brak zadań w bazie danych!");
-                }
-                return Ok(tasks);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Wystąpił błąd serwera: {ex.Message}");
-            }
-        }
-
-        [HttpGet("priority/{userId}/{priority}", Name = "GetTasksByPriority")]
-        public async Task<ActionResult<IEnumerable<Models.Task>>> GetTasksByPriority(Guid userId, int priority)
-        {
-            try
-            {
-                var tasks = await _taskService.GetTasksByPriority(userId, priority);
-                if (tasks == null || !tasks.Any())
-                {
-                    return NotFound("Brak zadań w bazie danych!");
-                }
-                return Ok(tasks);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Wystąpił błąd serwera: {ex.Message}");
-            }
-        }
-
-        [HttpGet("status/{userId}/{status}", Name = "GetTasksByStatus")]
-        public async Task<ActionResult<IEnumerable<Models.Task>>> GetTasksByStatus(Guid userId, int status)
-        {
-            try
-            {
-                var tasks = await _taskService.GetTasksByStatus(userId, status);
-                if (tasks == null || !tasks.Any())
-                {
-                    return NotFound("Brak zadań w bazie danych!");
-                }
-                return Ok(tasks);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Wystąpił błąd serwera: {ex.Message}");
-            }
-        }
-
-        [HttpGet("dueDate/{userId}/{dueDate}", Name = "GetTasksByDueDate")]
-        public async Task<ActionResult<IEnumerable<Models.Task>>> GetTasksByDueDate(Guid userId, DateTime dueDate)
-        {
-            try
-            {
-                var tasks = await _taskService.GetTasksByDueDate(userId, dueDate);
-                if (tasks == null || !tasks.Any())
-                {
-                    return NotFound("Brak zadań w bazie danych!");
-                }
-                return Ok(tasks);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Wystąpił błąd serwera: {ex.Message}");
-            }
-        }
-
-        [HttpGet("dueDateRange/{userId}/{startDate}/{endDate}", Name = "GetTasksByDueDateRange")]
-        public async Task<ActionResult<IEnumerable<Models.Task>>> GetTasksByDueDateRange(Guid userId, DateTime startDate, DateTime endDate)
-        {
-            try
-            {
-                var tasks = await _taskService.GetTasksByDueDateRange(userId, startDate, endDate);
-                if (tasks == null || !tasks.Any())
-                {
-                    return NotFound("Brak zadań w bazie danych!");
-                }
-                return Ok(tasks);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Wystąpił błąd serwera: {ex.Message}");
-            }
-        }
-
-        [HttpGet("name/{userId}/{name}", Name = "GetTasksByName")]
-        public async Task<ActionResult<IEnumerable<Models.Task>>> GetTasksByName(Guid userId, string name)
-        {
-            try
-            {
-                var tasks = await _taskService.GetTasksByName(userId, name);
-                if (tasks == null || !tasks.Any())
-                {
-                    return NotFound("Brak zadań w bazie danych!");
-                }
-                return Ok(tasks);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Wystąpił błąd serwera: {ex.Message}");
-            }
-        }
-
-        [HttpGet("createdDate/{userId}/{createdDate}", Name = "GetTasksByCreatedDate")]
-        public async Task<ActionResult<IEnumerable<Models.Task>>> GetTasksByCreatedDate(Guid userId, DateTime createdDate)
-        {
-            try
-            {
-                var tasks = await _taskService.GetTasksByCreatedDate(userId, createdDate);
-                if (tasks == null || !tasks.Any())
-                {
-                    return NotFound("Brak zadań w bazie danych!");
-                }
-                return Ok(tasks);
             }
             catch (Exception ex)
             {

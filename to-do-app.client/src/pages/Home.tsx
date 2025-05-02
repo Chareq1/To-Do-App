@@ -10,10 +10,9 @@ import 'react-calendar/dist/Calendar.css';
 import * as Icons from 'lucide-react';
 import SlidingPane from 'react-sliding-pane';
 import 'react-sliding-pane/dist/react-sliding-pane.css';
-import { pl } from 'date-fns/locale';
 import { DateTime } from 'luxon';
 
-// Import and register Chart.js components
+// Import potrzebnych komponentów z Chart.js
 import {
     Chart as ChartJS,
     ArcElement,
@@ -23,9 +22,10 @@ import {
 import React from 'react';
 import { parse, format } from 'date-fns';
 
+// Rejestracja komponentów Chart.js
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-// Add a plugin to display percentage in the center of the doughnut chart
+// Definicja pluginu do wyśrodkowania tekstu w wykresie
 const centerTextPlugin = {
     id: 'centerText',
     beforeDraw: (chart) => {
@@ -38,7 +38,7 @@ const centerTextPlugin = {
         const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
 
         ctx.save();
-        const fontSize = Math.min(width, height) * 0.2; // Responsive font size  
+        const fontSize = Math.min(width, height) * 0.2;
         ctx.font = `bold ${fontSize}px Ubuntu`;
         ctx.fillStyle = '#FFFFFF';
         ctx.textAlign = 'center';
@@ -48,9 +48,12 @@ const centerTextPlugin = {
     },
 };
 
+// Rejestracja pluginu do wykresów
 ChartJS.register(centerTextPlugin);
 
+// Strona główna aplikacji
 function Home() {
+    // Wszystkie potrzebne hooki i stany
     const { user, loggingOut } = useUser();
     const [tasks, setTasks] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -72,11 +75,7 @@ function Home() {
     const [quote, setQuote] = useState<string | null>(null);
     const [author, setAuthor] = useState<string | null>(null);
 
-    const toUTC = (date: string | Date | null) => {
-        if (!date) return null;
-        return DateTime.fromISO(date.toString(), { zone: 'local' }).toUTC().toISO();
-    };
-
+    // Efekt do ustawienia tła i pobrania zadań
     useEffect(() => {
         document.body.classList.add("bg-[#212121]");
         document.body.classList.replace("bg-[#ffffff]", "bg-[#212121]");
@@ -84,12 +83,14 @@ function Home() {
         fetchTasks();
     }, []);
 
+    // Funkcja do otwierania panelu
     const openPanel = (content: string, data: any = null) => {
         setPanelContent(content);
         setPanelData(data);
         setIsPanelOpen(true);
     };
 
+    // Funkcja do zamykania panelu
     const closePanel = () => {
         setIsPanelOpen(false);
         setPanelContent(null);
@@ -97,33 +98,39 @@ function Home() {
         setError(null);
     };
 
+    // Funkcja do losowania cytatu
     const randomQuote = async () => {
         try {
-            const response = await fetch('/Resources/Quotes.txt'); // Fetch the Quotes.txt file
+            const response = await fetch('/Resources/Quotes.txt');
 
             if (!response.ok) {
-                throw new Error('Failed to fetch quotes');
+                alert('Nie udało się pobrać cytatu. Spróbuj ponownie później.');
+                const errorData = await response.json();
+                throw new Error(errorData.message);
             }
 
             const text = await response.text();
-            const quotes = text.split('\n').filter(line => line.trim() !== ''); // Split into lines and filter empty lines
+            console.log(text);
+            const quotes = text.split('\n').filter(line => line.trim() !== '');
 
             if (quotes.length === 0) {
                 throw new Error('No quotes available');
             }
 
             const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-            const [quoteText, quoteAuthor] = randomQuote.split(' - ');
+            const [quoteText, quoteAuthor] = randomQuote.split(' / ');
 
             setQuote(quoteText.trim());
             setAuthor(quoteAuthor?.trim() || 'Nieznany autor');
         } catch (error) {
-            console.error('Error fetching quote:', error);
-            setQuote('Nie udało się załadować cytatu.');
+            alert('Nie udało się pobrać cytatu!');
+            console.error('Błąd podczas pobierania cytatu:', error);
+            setQuote('Nie udało się załadować cytatu!');
             setAuthor(null);
         }
     }
 
+    // Funkcja do aktualizacji statusu zadania
     const updateTaskStatus = async (taskId: string, newStatus) => {
         try {
             const patchDoc = [
@@ -140,23 +147,29 @@ function Home() {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to update task status');
+                alert('Nie udało się zaktualizować statusu zadania!');
+                const errorData = await response.json();
+                throw new Error(errorData.message);
             }
 
             fetchTasksWL();
 
         } catch (error) {
-            console.error('Error updating task status:', error);
+            alert('Nie udało się zaktualizować statusu zadania!');
+            console.error('Błąd podczas aktualizacji statusu zadania:', error);
         }
     };
 
+    // Funkcja do pobierania zadań i kategorii
     const fetchTasks = async () => {
         try {
             setIsLoading(true);
             const response = await fetch(`/api/Task/user/${user?.userId}`);
 
             if (!response.ok) {
-                throw new Error('Failed to fetch tasks');
+                alert('Nie udało się pobrać zadań!');
+                const errorData = await response.json();
+                throw new Error(errorData.message);
             }
 
             const tasks = await response.json();
@@ -164,7 +177,9 @@ function Home() {
             const categoryResponse = await fetch(`/api/Category/user/${user?.userId}`);
 
             if (!categoryResponse.ok) {
-                throw new Error('Failed to fetch categories');
+                alert('Nie udało się pobrać kategorii!');
+                const errorData = await categoryResponse.json();
+                throw new Error(errorData.message);
             }
 
             const categories = await categoryResponse.json();
@@ -223,7 +238,8 @@ function Home() {
             });
             randomQuote();
         } catch (error) {
-            console.error('Error fetching tasks:', error);
+            alert('Nie udało się pobrać zadań!');
+            console.error('Błąd podczas pobierania zadań:', error);
         }
         finally {
             setTimeout(() => {
@@ -232,12 +248,15 @@ function Home() {
         }
     };
 
+    // Funkcja do ponownego pobrania zadań
     const fetchTasksWL = async () => {
         try {
             const response = await fetch(`/api/Task/user/${user?.userId}`);
 
             if (!response.ok) {
-                throw new Error('Failed to fetch tasks');
+                alert('Nie udało się pobrać zadań!');
+                const errorData = await response.json();
+                throw new Error(errorData.message);
             }
 
             const tasks = await response.json();
@@ -245,7 +264,9 @@ function Home() {
             const categoryResponse = await fetch(`/api/Category/user/${user?.userId}`);
 
             if (!categoryResponse.ok) {
-                throw new Error('Failed to fetch categories');
+                alert('Nie udało się pobrać kategorii!');
+                const errorData = await categoryResponse.json();
+                throw new Error(errorData.message);
             }
 
             const categories = await categoryResponse.json();
@@ -302,10 +323,12 @@ function Home() {
                 completedThisYear,
             });
         } catch (error) {
-            console.error('Error fetching tasks:', error);
+            alert('Nie udało się pobrać zadań!');
+            console.error('Błąd podczas pobierania zadań:', error);
         }
     };
 
+    // Funkcja do tworzenia danych do wykresu doughnut
     const createDoughnutData = (value, total, color) => ({
         datasets: [
             {
@@ -316,6 +339,7 @@ function Home() {
         ],
     });
 
+    // Opcje wykresu doughnut
     const doughnutOptions = {
         responsive: true,
         aspectRatio: 2,
@@ -329,11 +353,12 @@ function Home() {
         },
     };
 
+    // Komponent do wyświetlania karty zadania
     const TaskCard = ({ task }: { task: any }) => {
         const isOutOfDate = task.dueDate && (() => {
-            const dueDate = DateTime.fromISO(task.dueDate).startOf('day'); // Normalize to the start of the day
-            const today = DateTime.now().startOf('day'); // Normalize current date to the start of the day
-            return dueDate < today && task.status !== 2; // Compare only the day
+            const dueDate = DateTime.fromISO(task.dueDate).startOf('day');
+            const today = DateTime.now().startOf('day');
+            return dueDate < today && task.status !== 2;
         })();
         const categoryOfTask = categories.find(category => category.categoryId === task.categoryId);
 
@@ -418,19 +443,19 @@ function Home() {
         );
     };
 
+    // Ilość wszystkich zadań
     const totalTasks = statistics.done + statistics.inProgress + statistics.toDo;
 
     return loggingOut ? (
         <LoadingScreen />
     ) : (
         <div className="flex w-full min-h-screen flex-row font-[Ubuntu] overflow-y-auto">
-            {/* Navigation */}
             <div className="p-5">
                 <Navigation />
             </div>
             <div className="flex flex-col w-full pb-5 pt-5 pr-5 text-[#E8E8E8] max-h-screen min-h-screen">
                 <div className="flex flex-col h-full w-full bg-[#313131] rounded-xl overflow-x-auto">
-                    {/* Welcome Section */}
+                    {/* Nagłówek */}
                     <div className="p-5 w-full">
                         <h1 className="text-2xl md:text-4xl font-bold">
                             Witaj, {user?.name || 'Użytkowniku'}!
@@ -451,6 +476,7 @@ function Home() {
                         <>
                             <div className="w-full flex items-center justify-center h-full overflow-x-auto">
                                 <div className="flex flex-col md:flex-row w-full rounded-lg gap-y-5 md:gap-x-5 h-full p-5 min-w-0">
+                                    {/* Karta zadań */}
                                     <div className="w-full h-full bg-[#313131] p-5 flex flex-col rounded-2xl bg-[#414141]">
                                         <div className="mb-5 w-full flex-none flex justify-between items-center">
                                             <h1 className="text-xl font-bold text-white">Zadania do wykonania</h1>
@@ -473,15 +499,16 @@ function Home() {
                                                     ))}
                                                 </div>
                                             ) : (
-                                                 <div className="flex items-center justify-center h-full">
-                                                                <p className="text-gray-400 text-center mt-10">Brak zadań na dziś!</p>
-                                                            </div>
+                                                <div className="flex items-center justify-center h-full">
+                                                    <p className="text-gray-400 text-center mt-10">Brak zadań na dziś!</p>
+                                                </div>
 
                                             )}
                                         </div>
                                     </div>
 
                                     <div className="w-full flex flex-col h-full">
+                                        {/* Wykresy */}
                                         <div className="w-full bg-[#414141] rounded-xl p-5 mb-5 overflow-hidden flex-5 md:flex-2">
                                             <h2 className="text-xl font-bold text-white mb-3 md:mb-0">Statystyki zadań</h2>
                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-center justify-center h-full overflow-y-auto flex">
@@ -516,6 +543,7 @@ function Home() {
                                         </div>
 
 
+                                        {/*Statystyki liczbowe*/}
                                         <div className="bg-[#414141] rounded-xl p-5 mb-5 flex-col flex-1">
                                             <h2 className="text-xl font-bold mb-3 text-white h-1/3">Statystyki liczbowe</h2>
                                             <div className="flex justify-center items-center w-full h-2/3">
@@ -534,6 +562,7 @@ function Home() {
                                             </div>
                                         </div>
 
+                                        {/*Cytat*/}
                                         <div className="bg-[#414141] rounded-xl p-5 row-3 flex-1 flex flex-col mb-5 md:mb-0">
                                             <h2 className="text-xl font-bold mb-3 text-white">Losowy cytat</h2>
                                             <div className="flex justify-center items-center w-full flex-col h-full">
@@ -553,216 +582,217 @@ function Home() {
                         </>
                     )}
                 </div>
-                </div>
-                <SlidingPane
-                    isOpen={isPanelOpen}
-                    title={
-                        panelContent === 'addTask'
-                            ? 'Dodaj zadanie'
-                            : panelContent === 'editTask'
-                                ? 'Edytuj zadanie'
-                                : ''
-                    }
-                    onRequestClose={closePanel}
-                    from="right"
-                    width="425px"
-                >
-                    {panelContent === 'addTask' && (
-                        <div>
-                            <form
-                                onSubmit={async (e) => {
-                                    e.preventDefault();
+            </div>
+            {/* Panel boczny do dodawania zadań */}
+            <SlidingPane
+                isOpen={isPanelOpen}
+                title={
+                    panelContent === 'addTask'
+                        ? 'Dodaj zadanie'
+                        : panelContent === 'editTask'
+                            ? 'Edytuj zadanie'
+                            : ''
+                }
+                onRequestClose={closePanel}
+                from="right"
+                width="425px"
+            >
+                {panelContent === 'addTask' && (
+                    <div>
+                        <form
+                            onSubmit={async (e) => {
+                                e.preventDefault();
 
-                                    setIsDisabled(true);
-                                    setButton(
-                                        <>
-                                            <Notebook className="animate-bounce size-6/12 text-white" />
-                                            <span className="sr-only">Ładowanie..</span>
-                                        </>
-                                    );
+                                setIsDisabled(true);
+                                setButton(
+                                    <>
+                                        <Notebook className="animate-bounce size-6/12 text-white" />
+                                        <span className="sr-only">Ładowanie..</span>
+                                    </>
+                                );
 
-                                    const formData = new FormData(e.currentTarget);
-                                    const newName = formData.get("name") as string;
-                                    const newDescription = formData.get("description") as string;
-                                    const newStatus = formData.get("status") as string;
-                                    const newPriority = formData.get("priority") as string;
-                                    const newDueDate = formData.get("dueDate") as string;
-                                    const newDueTime = formData.get("dueTime") as string;
-                                    var newCategoryId = formData.get("categoryId") as string;
-                                    const newUserId = user?.userId;
+                                const formData = new FormData(e.currentTarget);
+                                const newName = formData.get("name") as string;
+                                const newDescription = formData.get("description") as string;
+                                const newStatus = formData.get("status") as string;
+                                const newPriority = formData.get("priority") as string;
+                                const newDueDate = formData.get("dueDate") as string;
+                                const newDueTime = formData.get("dueTime") as string;
+                                var newCategoryId = formData.get("categoryId") as string;
+                                const newUserId = user?.userId;
 
-                                    if (newCategoryId == "" || newCategoryId.trim() === "") {
-                                        newCategoryId = null;
-                                    }
+                                if (newCategoryId == "" || newCategoryId.trim() === "") {
+                                    newCategoryId = null;
+                                }
 
-                                    if (!newName || newName.trim() === "" || !newStatus || newStatus.trim() === "" || !newPriority || newPriority.trim() === "") {
-                                        setError("Wszystkie pola są wymagane!");
+                                if (!newName || newName.trim() === "" || !newStatus || newStatus.trim() === "" || !newPriority || newPriority.trim() === "") {
+                                    setError("Wszystkie pola są wymagane!");
+                                    setIsDisabled(false);
+                                    setButton(<><Plus className="w-5 h-5 lg:mr-2" /><p className="block">Dodaj</p></>);
+                                    return;
+                                }
+
+                                const combinedDueDate = newDueDate && newDueTime
+                                    ? new Date(`${newDueDate}T${newDueTime}`)
+                                    : null;
+
+                                const newTask = {
+                                    name: newName,
+                                    description: newDescription,
+                                    status: newStatus,
+                                    priority: newPriority,
+                                    categoryId: newCategoryId,
+                                    userId: newUserId,
+                                    dueDate: combinedDueDate,
+                                    doneDate: newStatus === "done" ? new Date() : null,
+                                };
+
+                                try {
+                                    const response = await fetch("/api/Task", {
+                                        method: "POST",
+                                        headers: { "Content-Type": "application/json" },
+                                        body: JSON.stringify(newTask),
+                                    });
+
+                                    if (!response.ok) {
+                                        const data = await response.json();
+                                        setError(<>{data.message}</>);
                                         setIsDisabled(false);
-                                        setButton(<><Plus className="w-5 h-5 lg:mr-2" /><p className="block">Dodaj</p></>);
+                                        setButton(<><Plus className="w-5 h-5 lg:mr-2" /><p className="hidden lg:block">Dodaj</p></>);
                                         return;
                                     }
 
-                                    const combinedDueDate = newDueDate && newDueTime 
-                                        ? new Date(`${newDueDate}T${newDueTime}`)
-                                        : null;
+                                    fetchTasksWL();
+                                    closePanel();
+                                } catch (error) {
+                                    setError("Wystąpił błąd przy dodawaniu zadania!");
+                                } finally {
+                                    setIsDisabled(false);
+                                    setButton(<><Plus className="w-5 h-5 lg:mr-2" /><p className="block">Dodaj</p></>);
+                                }
+                            }}
+                        >
+                            <div>
+                                <label className="pl-5 pb-2 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-full">Nazwa zadania</label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    minLength="1"
+                                    maxLength="255"
+                                    className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-full"
+                                    onChange={() => setError(null)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter")
+                                            document.getElementsByName("description")[0].focus();
+                                    }}
+                                />
+                            </div>
 
-                                    const newTask = {
-                                        name: newName,
-                                        description: newDescription,
-                                        status: newStatus,
-                                        priority: newPriority,
-                                        categoryId: newCategoryId,
-                                        userId: newUserId,
-                                        dueDate: combinedDueDate,
-                                        doneDate: newStatus === "done" ? new Date() : null,
-                                    };
+                            <div className="mt-5">
+                                <label className="pl-5 pb-2 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-full">Opis</label>
+                                <textarea
+                                    name="description"
+                                    className="border-[#2775EE] border-2 pl-5 pr-5 pt-2 pb-2 h-12 md:text-sm lg:text-base rounded-2xl bg-[#4a4a4a] text-[#e8e8e8] w-full"
+                                    onChange={() => setError(null)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter")
+                                            document.getElementsByName("status")[0].focus();
+                                    }}
+                                ></textarea>
+                            </div>
 
-                                    try {
-                                        const response = await fetch("/api/Task", {
-                                            method: "POST",
-                                            headers: { "Content-Type": "application/json" },
-                                            body: JSON.stringify(newTask),
-                                        });
+                            <div className="mt-5">
+                                <label className="pl-5 pb-2 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-full">Status</label>
+                                <select
+                                    name="status"
+                                    className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-full"
+                                    defaultValue="todo"
+                                    onChange={() => setError(null)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter")
+                                            document.getElementsByName("priority")[0].focus();
+                                    }}
+                                >
+                                    <option value="todo">Do zrobienia</option>
+                                    <option value="inprogress">W trakcie</option>
+                                    <option value="done">Zrobione</option>
+                                </select>
+                            </div>
 
-                                        if (!response.ok) {
-                                            const data = await response.json();
-                                            setError(<>{data.message}</>);
-                                            setIsDisabled(false);
-                                            setButton(<><Plus className="w-5 h-5 lg:mr-2" /><p className="hidden lg:block">Dodaj</p></>);
-                                            return;
-                                        }
+                            <div className="mt-5">
+                                <label className="pl-5 pb-2 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-full">Priorytet</label>
+                                <select
+                                    name="priority"
+                                    className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-full"
+                                    defaultValue="medium"
+                                    onChange={() => setError(null)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter")
+                                            document.getElementsByName("dueDate")[0].focus();
+                                    }}
+                                >
+                                    <option value="low">Niski</option>
+                                    <option value="medium">Średni</option>
+                                    <option value="high">Wysoki</option>
+                                </select>
+                            </div>
 
-                                        fetchTasksWL();
-                                        closePanel();
-                                    } catch (error) {
-                                        setError("Wystąpił błąd przy dodawaniu zadania!");
-                                    } finally {
-                                        setIsDisabled(false);
-                                        setButton(<><Plus className="w-5 h-5 lg:mr-2" /><p className="block">Dodaj</p></>);
-                                    }
-                                }}
-                            >
-                                <div>
-                                    <label className="pl-5 pb-2 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-full">Nazwa zadania</label>
+                            <div className="mt-5">
+                                <label className="pl-5 pb-2 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-full">Kategoria</label>
+                                <select
+                                    name="categoryId"
+                                    onChange={() => setError(null)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter")
+                                            document.getElementsByName("dueDate")[0].focus();
+                                    }}
+                                    defaultValue={panelData?.categoryId || ""}
+                                    className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-full"
+                                >
+                                    <option value="">Brak kategorii</option>
+                                    {categories.map((category) => (
+                                        <option key={category.categoryId} value={category.categoryId}>
+                                            {category.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="mt-5">
+                                <label className="pl-5 pb-2 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-full">Termin</label>
+                                <div className="flex gap-2">
                                     <input
-                                        type="text"
-                                        name="name"
-                                        minLength="1"
-                                        maxLength="255"
-                                        className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-full"
+                                        type="date"
+                                        name="dueDate"
                                         onChange={() => setError(null)}
-                                        onKeyDown={(e) => {
-                                            if (e.key === "Enter")
-                                                document.getElementsByName("description")[0].focus();
-                                        }}
+                                        className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-1/2"
+                                    />
+                                    <input
+                                        type="time"
+                                        name="dueTime"
+                                        onChange={() => setError(null)}
+                                        className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-1/2"
                                     />
                                 </div>
+                            </div>
 
-                                <div className="mt-5">
-                                    <label className="pl-5 pb-2 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-full">Opis</label>
-                                    <textarea
-                                        name="description"
-                                        className="border-[#2775EE] border-2 pl-5 pr-5 pt-2 pb-2 h-12 md:text-sm lg:text-base rounded-2xl bg-[#4a4a4a] text-[#e8e8e8] w-full"
-                                        onChange={() => setError(null)}
-                                        onKeyDown={(e) => {
-                                            if (e.key === "Enter")
-                                                document.getElementsByName("status")[0].focus();
-                                        }}
-                                    ></textarea>
-                                </div>
+                            <div className="pt-3 items-center justify-center text-center">
+                                <p className="text-[#FF2400]">{error}</p>
+                            </div>
 
-                                <div className="mt-5">
-                                    <label className="pl-5 pb-2 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-full">Status</label>
-                                    <select
-                                        name="status"
-                                        className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-full"
-                                        defaultValue="todo"
-                                        onChange={() => setError(null)}
-                                        onKeyDown={(e) => {
-                                            if (e.key === "Enter")
-                                                document.getElementsByName("priority")[0].focus();
-                                        }}
-                                    >
-                                        <option value="todo">Do zrobienia</option>
-                                        <option value="inprogress">W trakcie</option>
-                                        <option value="done">Zrobione</option>
-                                    </select>
-                                </div>
-
-                                <div className="mt-5">
-                                    <label className="pl-5 pb-2 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-full">Priorytet</label>
-                                    <select
-                                        name="priority"
-                                        className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-full"
-                                        defaultValue="medium"
-                                        onChange={() => setError(null)}
-                                        onKeyDown={(e) => {
-                                            if (e.key === "Enter")
-                                                document.getElementsByName("dueDate")[0].focus();
-                                        }}
-                                    >
-                                        <option value="low">Niski</option>
-                                        <option value="medium">Średni</option>
-                                        <option value="high">Wysoki</option>
-                                    </select>
-                                </div>
-
-                                <div className="mt-5">
-                                    <label className="pl-5 pb-2 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-full">Kategoria</label>
-                                    <select
-                                        name="categoryId"
-                                        onChange={() => setError(null)}
-                                        onKeyDown={(e) => {
-                                            if (e.key === "Enter")
-                                                document.getElementsByName("dueDate")[0].focus();
-                                        }}
-                                        defaultValue={panelData?.categoryId || ""}
-                                        className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-full"
-                                    >
-                                        <option value="">Brak kategorii</option>
-                                        {categories.map((category) => (
-                                            <option key={category.categoryId} value={category.categoryId}>
-                                                {category.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                <div className="mt-5">
-                                    <label className="pl-5 pb-2 md:text-sm lg:text-base font-bold text-[#e8e8e8] w-full">Termin</label>
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="date"
-                                            name="dueDate"
-                                            onChange={() => setError(null)}
-                                            className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-1/2"
-                                        />
-                                        <input
-                                            type="time"
-                                            name="dueTime"
-                                            onChange={() => setError(null)}
-                                            className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-1/2"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="pt-3 items-center justify-center text-center">
-                                    <p className="text-[#FF2400]">{error}</p>
-                                </div>
-
-                                <div className="w-full flex mt-10 justify-center items-center">
-                                    <button
-                                        type="submit"
-                                        disabled={isDisabled}
-                                        className="flex rounded-full items-center justify-center text-white h-12 bg-[#2775EE] hover:cursor-pointer hover:bg-[#0F52BA] md:text-base lg:text-lg shadow-[0px_9px_30px_rgba(0,0,0,0.3)] w-1/2"
-                                    >
-                                        {button}
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    )}
-                </SlidingPane>
+                            <div className="w-full flex mt-10 justify-center items-center">
+                                <button
+                                    type="submit"
+                                    disabled={isDisabled}
+                                    className="flex rounded-full items-center justify-center text-white h-12 bg-[#2775EE] hover:cursor-pointer hover:bg-[#0F52BA] md:text-base lg:text-lg shadow-[0px_9px_30px_rgba(0,0,0,0.3)] w-1/2"
+                                >
+                                    {button}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                )}
+            </SlidingPane>
         </div>
     );
 }

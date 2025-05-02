@@ -4,6 +4,7 @@ using To_Do_App.Server.Data;
 
 namespace To_Do_App.Server.Models
 {
+    // Model tabeli dla zadań
     [Table("Tasks")]
     public class Task
     {

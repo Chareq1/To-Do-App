@@ -1,5 +1,6 @@
 ﻿import SlidingPane from "react-sliding-side-panel";
 
+// Komponent do wyświetlania panelu bocznego
 const SlidingPanel = ({ isOpen, onClose, children }: { isOpen: boolean; onClose: () => void; children: React.ReactNode }) => (
     <SlidingPane
         isOpen={isOpen}

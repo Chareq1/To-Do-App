@@ -48,12 +48,11 @@ input[type="color" i] {
     border-color: #2775EE;
 }
 
-    /* Affects area between outer circle and color swatch. Firefox doesn't have an equivalent. */
     input[type="color" i]::-webkit-color-swatch-wrapper {
         padding: 1px;
     }
 
-    /* Affects the inner circle, i.e. the current color selection */
+
     input[type="color" i]::-webkit-color-swatch {
         @apply !rounded-full p-0 border-0;
     }
@@ -61,4 +60,3 @@ input[type="color" i] {
     input[type="color" i]::-moz-color-swatch {
         @apply !rounded-full p-0 border-0;
     }
-

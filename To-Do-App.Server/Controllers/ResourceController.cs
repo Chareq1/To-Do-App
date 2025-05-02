@@ -11,16 +11,20 @@ namespace To_Do_App.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    // Kontroler do obsługi plików
     public class ResourceController : ControllerBase
     {
+        // Usługi
         private readonly Services.Interfaces.IResourceService _resourceService;
 
+        // Konstruktor
         public ResourceController(Services.Interfaces.IResourceService resourceService)
         {
             _resourceService = resourceService;
         }
 
-        [HttpGet(Name = "GetAllUserResources")]
+        // Metoda do uzyskiwania wszystkich zasobów z mapowaniem i metodą HTTP
+        [HttpGet(Name = "GetAllResources")]
         public async Task<ActionResult<IEnumerable<Resource>>> GetResources()
         {
             try
@@ -34,6 +38,7 @@ namespace To_Do_App.Server.Controllers
             }
         }
 
+        // Metoda do uzyskiwania pliku po ID z mapowaniem i metodą HTTP
         [HttpGet("{resourceId}", Name = "GetResourceById")]
         public async Task<ActionResult<Resource>> GetResource(Guid resourceId)
         {
@@ -52,6 +57,7 @@ namespace To_Do_App.Server.Controllers
             }
         }
 
+        // Metoda do dodawania pliku z mapowaniem i metodą HTTP
         [HttpPost(Name = "AddResource")]
         public async Task<ActionResult<Resource>> AddResource([FromForm] FileUploadRequest file, [FromQuery] Guid taskId)
         {
@@ -95,6 +101,7 @@ namespace To_Do_App.Server.Controllers
             }
         }
 
+        // Metoda do aktualizacji pliku z mapowaniem i metodą HTTP
         [HttpPatch("{resourceId}", Name = "UpdateResource")]
         public async Task<IActionResult> UpdateResource(Guid resourceId, [FromBody] JsonPatchDocument<Resource> pathDoc)
         {
@@ -119,6 +126,7 @@ namespace To_Do_App.Server.Controllers
             }
         }
 
+        // Metoda do usuwania pliku z mapowaniem i metodą HTTP
         [HttpDelete("{resourceId}", Name = "DeleteResource")]
         public async Task<IActionResult> DeleteResource(Guid resourceId)
         {
@@ -138,30 +146,13 @@ namespace To_Do_App.Server.Controllers
             }
         }
 
+        // Metoda do uzyskiwania plików po ID zadania z mapowaniem i metodą HTTP
         [HttpGet("task/{taskId}", Name = "GetResourcesByTask")]
         public async Task<ActionResult<IEnumerable<Resource>>> GetResourcesByTask(Guid taskId)
         {
             try
             {
                 var resources = await _resourceService.GetResourcesByTask(taskId);
-                return Ok(resources);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Wystąpił błąd serwera: {ex.Message}");
-            }
-        }
-
-        [HttpGet("type/{type}", Name = "GetResourcesByType")]
-        public async Task<ActionResult<IEnumerable<Resource>>> GetResourcesByType(String type)
-        {
-            try
-            {
-                var resources = await _resourceService.GetResourcesByType(type);
-                if (resources == null || !resources.Any())
-                {
-                    return NotFound("Brak zasobów o podanym typie!");
-                }
                 return Ok(resources);
             }
             catch (Exception ex)
