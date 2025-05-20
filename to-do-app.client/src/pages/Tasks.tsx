@@ -330,12 +330,12 @@ function Tasks() {
         return (
             <div
                 key={task.taskId}
-                className="flex items-center justify-between bg-[#515151] p-4 rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 mb-2 w-full"
+                className="flex flex-col md:flex-row items-center md:items-center justify-center md:justify-between bg-[#515151] p-4 rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 mb-2 w-full"
             >
-                <div className="flex items-center gap-4 w-full">
-                    <div className="flex items-center gap-2">
+                <div className="flex flex-col md:flex-row items-center sm:items-center gap-4 w-full">
+                    <div className="flex items-center gap-2 flex-col md:flex-row">
                         <button
-                            className="mr-2 cursor-pointer w-5 h-5"
+                            className="mr-0 md:mr-2  cursor-pointer w-5 h-5"
                             onClick={() =>
                                 updateTaskStatus(
                                     task.taskId,
@@ -357,18 +357,17 @@ function Tasks() {
                         </button>
 
                         <h4
-                            className={`text-sm md:text-lg text-[#E8E8E8] break-all ${task.status === 2 ? 'line-through' : ''
+                            className={`text-sm md:text-lg text-[#E8E8E8]  ${task.status === 2 ? 'line-through' : ''
                                 }`}
                         >
                             {task.name}
                         </h4>
                     </div>
 
-                    <div className="flex items-center gap-2 flex-col md:flex-row">
+                    <div className="flex items-center gap-2 flex-row">
                         {task.status === 1 && (
                             <Clock
                                 className="text-yellow-500 w-4 h-4"
-                                title="W trakcie"
                             />
                         )}
 
@@ -379,39 +378,37 @@ function Tasks() {
                                     ? 'text-yellow-500'
                                     : 'text-green-500'
                                 }`}
-                            title="Ważność"
                         />
 
                         {isOutOfDate && (
                             <ClockAlert
                                 className="text-red-500 w-4 h-4"
-                                title="Przeterminowane"
                             />
                         )}
                     </div>
                 </div>
 
-                <div className="flex gap-2 ml-5">
+                <div className="flex gap-2 ml-0 md:ml-5 justify-center md:justify-end w-full md:w-auto mt-3 md:mt-0">
                     <button
                         className="text-blue-500 cursor-pointer hover:text-blue-600"
                         onClick={() => openPanel('viewTask', task)}
                         title="Zobacz szczegóły"
                     >
-                        <Eye />
+                        <Eye className="w-5 h-5 md:w-6 md:h-6" />
                     </button>
                     <button
                         className="text-blue-500 cursor-pointer hover:text-blue-600"
                         onClick={() => openPanel('editTask', task)}
                         title="Edytuj zadanie"
                     >
-                        <Edit />
+                        <Edit className="w-5 h-5 md:w-6 md:h-6" />
                     </button>
                     <button
                         className="text-red-500 cursor-pointer hover:text-red-600"
                         onClick={() => handleDeleteTask(task.taskId, task.name)}
                         title="Usuń zadanie"
                     >
-                        <Trash2 />
+                        <Trash2 className="w-5 h-5 md:w-6 md:h-6" />
                     </button>
                 </div>
             </div>
@@ -432,7 +429,7 @@ function Tasks() {
                     <div className="p-5 w-full flex justify-between items-center">
                         <h1 className="font-bold text-4xl">Zadania</h1>
 
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 ml-5 md:ml-0">
                             <button
                                 className="bg-[#2775EE] hover:bg-[#0F52BA] text-white px-4 py-2 rounded-full text-xs md:text-base flex justify-center items-center font-bold cursor-pointer"
                                 onClick={() => { setSelectedIcon("Notebook"); openPanel('addCategory') }}
@@ -489,7 +486,7 @@ function Tasks() {
                                                 </div>
                                             </div>
 
-                                            <div className="flex gap-2">
+                                            <div className="flex gap-2 ml-5 md:ml-0">
                                                 <button
                                                     className="text-blue-500 cursor-pointer hover:text-blue-600"
                                                     onClick={() => { setSelectedIcon(category.iconName); openPanel('editCategory', category) }}
@@ -517,7 +514,7 @@ function Tasks() {
                                         </div>
 
                                         {!collapsedCategories.includes(category.categoryId) && (
-                                            <div className="overflow-y-auto max-h-75 md:h-full">
+                                            <div className="overflow-y-auto max-h-75 md:h-full mt-2">
                                                 <ul className="mt-2">
                                                     {tasks
                                                         .filter((task) => task.categoryId === category.categoryId)
@@ -565,7 +562,7 @@ function Tasks() {
                                     </div>
 
                                     {!collapsedCategories.includes('no-category') && (
-                                        <div className="overflow-y-auto max-h-75  md:h-full">
+                                        <div className="overflow-y-auto max-h-75  md:h-full mt-2">
                                             <ul className="mt-2">
                                                 {tasks
                                                     .filter((task) => !task.categoryId)
@@ -1008,7 +1005,7 @@ function Tasks() {
                                     patchDoc.push({ op: "replace", path: "/dueDate", value: combinedDueDate });
                                 }
 
-                                if (updatedCategoryId !== panelData.categoryId) {
+                                if (updatedCategoryId !== panelData.categoryId) {s
                                     if (updatedCategoryId == "" || updatedCategoryId.trim() === "") {
                                         patchDoc.push({ op: "replace", path: "/categoryId", value: null });
                                     }

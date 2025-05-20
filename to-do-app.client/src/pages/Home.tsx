@@ -20,7 +20,6 @@ import {
     Legend,
 } from 'chart.js';
 import React from 'react';
-import { parse, format } from 'date-fns';
 
 // Rejestracja komponentów Chart.js
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -33,7 +32,7 @@ const centerTextPlugin = {
         const { height } = chart;
         const ctx = chart.ctx;
         const dataset = chart.data.datasets[0];
-        const total = dataset.data.reduce((acc, value) => acc + value, 0);
+        const total = dataset.data.reduce((acc: number, value: number) => acc + value, 0);
         const value = dataset.data[0];
         const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
 
@@ -55,9 +54,9 @@ ChartJS.register(centerTextPlugin);
 function Home() {
     // Wszystkie potrzebne hooki i stany
     const { user, loggingOut } = useUser();
-    const [tasks, setTasks] = useState([]);
+    const [tasks, setTasks] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [categories, setCategories] = useState([]);
+    const [categories, setCategories] = useState<any[]>([]);
     const [statistics, setStatistics] = useState({
         done: 0,
         inProgress: 0,
@@ -110,7 +109,6 @@ function Home() {
             }
 
             const text = await response.text();
-            console.log(text);
             const quotes = text.split('\n').filter(line => line.trim() !== '');
 
             if (quotes.length === 0) {
@@ -131,7 +129,7 @@ function Home() {
     }
 
     // Funkcja do aktualizacji statusu zadania
-    const updateTaskStatus = async (taskId: string, newStatus) => {
+    const updateTaskStatus = async (taskId: string, newStatus: number) => {
         try {
             const patchDoc = [
                 { op: "replace", path: "/status", value: newStatus },
@@ -329,7 +327,7 @@ function Home() {
     };
 
     // Funkcja do tworzenia danych do wykresu doughnut
-    const createDoughnutData = (value, total, color) => ({
+    const createDoughnutData = (value:number, total:number, color:string) => ({
         datasets: [
             {
                 data: [value, total - value],
@@ -365,25 +363,26 @@ function Home() {
         return (
             <div
                 key={task.taskId}
-                className="flex items-center justify-between bg-[#515151] p-4 rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 mb-2 w-full"
+                className="flex flex-col md:flex-row items-start md:items-center justify-between bg-[#515151] p-4 rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 mb-2 w-full"
             >
-                <div className="flex items-center gap-4 w-full">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full">
                     <div
-                        className="w-12 h-12 flex items-center justify-center rounded-full font-bold shrink-0"
+                        className="w-12 h-12 flex items-center justify-center rounded-full font-bold shrink-0 self-center sm:self-auto"
                         style={{
                             backgroundColor: categoryOfTask?.colorHex || 'var(--color-gray-400)',
                         }}
                     >
                         {React.createElement(
-                            Icons[categoryOfTask?.iconName as keyof typeof Icons || 'BadgeAlert'], // Use category icon or fallback to BadgeAlert
+                            Icons[categoryOfTask?.iconName || 'BadgeAlert'],
                             { className: 'text-white w-6 h-6' }
                         )}
                     </div>
 
+
                     <div className="flex flex-col w-full">
-                        <div className="flex items-center gap-2 w-full">
+                        <div className="flex items-center gap-2 w-full flex-col md:flex-row">
                             <button
-                                className="mr-2 cursor-pointer w-5 h-5"
+                                className="mr-0 md:mr-2 cursor-pointer w-5 h-5"
                                 onClick={() =>
                                     updateTaskStatus(
                                         task.taskId,
@@ -405,17 +404,16 @@ function Home() {
                             </button>
 
                             <h4
-                                className={`text-sm md:text-lg text-[#E8E8E8] break-all ${task.status === 2 ? 'line-through' : ''
+                                className={`text-sm md:text-lg text-[#E8E8E8] ${task.status === 2 ? 'line-through' : ''
                                     }`}
                             >
                                 {task.name}
                             </h4>
 
-                            <div className="flex items-center gap-2 flex-col md:flex-row">
+                            <div className="flex items-center gap-2 flex-row">
                                 {task.status === 1 && (
                                     <Clock
                                         className="text-yellow-500 w-4 h-4"
-                                        title="W trakcie"
                                     />
                                 )}
 
@@ -426,13 +424,11 @@ function Home() {
                                             ? 'text-yellow-500'
                                             : 'text-green-500'
                                         }`}
-                                    title="Ważność"
                                 />
 
                                 {isOutOfDate && (
                                     <ClockAlert
                                         className="text-red-500 w-4 h-4"
-                                        title="Przeterminowane"
                                     />
                                 )}
                             </div>

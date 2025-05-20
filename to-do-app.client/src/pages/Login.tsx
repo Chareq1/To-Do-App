@@ -118,6 +118,7 @@ const Login = () => {
                             maxLength="128"
                             placeholder="Hasło"
                             className="border-[#2775EE] border-2 pl-5 h-12 md:text-sm lg:text-base rounded-full bg-[#4a4a4a] text-[#e8e8e8] w-3/4"
+                            required
                             value={password}
                             onChange={(e) => { setError(null); setPassword(e.target.value); }}
                             onKeyDown={(e) => {

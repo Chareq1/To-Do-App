@@ -24,6 +24,7 @@ import React from 'react';
 
 // Interfejs do reprezentacji wydarzenia
 interface Event {
+    taskId: string;
     title: string;
     start: Date;
     end: Date;
@@ -100,7 +101,7 @@ function Calendar() {
     }, [user]);
 
     // Funkcja do aktualizacji statusu zadania
-    const updateTaskStatus = async (taskId: string, newStatus) => {
+    const updateTaskStatus = async (taskId: string, newStatus: number) => {
         try {
             const patchDoc = [
                 { op: "replace", path: "/status", value: newStatus },
@@ -177,7 +178,7 @@ function Calendar() {
     };
 
     // Funkcja do obsługi kliknięcia w datę
-    const onDateClick = (day) => {
+    const onDateClick = (day:Date) => {
         setSelectedDate(day);
 
         if (!isSameMonth(day, currentMonth)) {
@@ -208,7 +209,7 @@ function Calendar() {
 
                 days.push(
                     <div
-                        key={day}
+                        key={day.toISOString()}
                         onClick={() => onDateClick(cloneDay)}
                         className={`flex justify-center items-center h-14 w-full cursor-pointer text-sm relative
               ${!inCurrentMonth ? 'text-gray-500' : 'text-[#e8e8e8]'}
@@ -226,7 +227,7 @@ function Calendar() {
                 day = addDays(day, 1);
             }
             rows.push(
-                <div className="grid grid-cols-7 h-full" key={day}>
+                <div className="grid grid-cols-7 h-full" key={day.toISOString()}>
                     {days}
                 </div>
             );
@@ -249,11 +250,11 @@ function Calendar() {
         return (
             <div
                 key={task.taskId}
-                className="flex items-center justify-between bg-[#515151] p-4 rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 mb-2 w-full"
+                className="flex flex-col md:flex-row items-start md:items-center justify-between bg-[#515151] p-4 rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 mb-2 w-full"
             >
-                <div className="flex items-center gap-4 w-full">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full">
                     <div
-                        className="w-12 h-12 flex items-center justify-center rounded-full font-bold shrink-0"
+                        className="w-12 h-12 flex items-center justify-center rounded-full font-bold shrink-0 self-center sm:self-auto"
                         style={{
                             backgroundColor: task.category?.colorHex || 'var(--color-gray-400)',
                         }}
@@ -265,9 +266,9 @@ function Calendar() {
                     </div>
 
                     <div className="flex flex-col w-full">
-                        <div className="flex items-center gap-2 w-full">
+                        <div className="flex items-center gap-2 w-full flex-col md:flex-row">
                             <button
-                                className="mr-2 cursor-pointer w-5 h-5"
+                                className="mr-0 md:mr-2  cursor-pointer w-5 h-5"
                                 onClick={() =>
                                     updateTaskStatus(
                                         task.taskId,
@@ -289,17 +290,16 @@ function Calendar() {
                             </button>
 
                             <h4
-                                className={`text-sm md:text-lg text-[#E8E8E8] break-all ${task.status === 2 ? 'line-through' : ''
+                                className={`text-sm md:text-lg text-[#E8E8E8] ${task.status === 2 ? 'line-through' : ''
                                     }`}
                             >
                                 {task.title}
                             </h4>
 
-                            <div className="flex items-center gap-2 flex-col md:flex-row">
+                            <div className="flex items-center gap-2 flex-row">
                                 {task.status === 1 && (
                                     <Clock
                                         className="text-yellow-500 w-4 h-4"
-                                        title="W trakcie"
                                     />
                                 )}
 
@@ -310,19 +310,17 @@ function Calendar() {
                                             ? 'text-yellow-500'
                                             : 'text-green-500'
                                         }`}
-                                    title="Ważność"
                                 />
 
                                 {isOutOfDate && (
                                     <ClockAlert
                                         className="text-red-500 w-4 h-4"
-                                        title="Przeterminowane"
                                     />
                                 )}
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-center md:justify-start w-full mt-2 md:mt-0">
                             {taskTime && (
                                 <p className="text-xs md:text-sm text-gray-400">
                                     {taskTime}
