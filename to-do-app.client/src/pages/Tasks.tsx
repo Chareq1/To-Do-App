@@ -1005,7 +1005,7 @@ function Tasks() {
                                     patchDoc.push({ op: "replace", path: "/dueDate", value: combinedDueDate });
                                 }
 
-                                if (updatedCategoryId !== panelData.categoryId) {s
+                                if (updatedCategoryId !== panelData.categoryId) {
                                     if (updatedCategoryId == "" || updatedCategoryId.trim() === "") {
                                         patchDoc.push({ op: "replace", path: "/categoryId", value: null });
                                     }
